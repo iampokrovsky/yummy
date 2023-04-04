@@ -1,0 +1,48 @@
+version: "3.9"
+
+services:
+
+  postgres:
+    image: postgres
+    container_name: postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+    environment:
+      POSTGRES_USER: "${DB_USER:-user}"
+      POSTGRES_PASSWORD: "${DB_PASS:-pass}"
+      POSTGRES_DB: "${DB_NAME:-test_db}"
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  goose:
+    image: goose
+    build: ./migrations
+    container_name: goose
+    environment:
+      DB_USER: "${DB_USER:-user}"
+      DB_PASS: "${DB_PASS:-pass}"
+      DB_NAME: "${DB_NAME:-test_db}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  pgweb:
+    image: sosedoff/pgweb
+    container_name: pgweb
+    restart: always
+    environment:
+      PGWEB_DATABASE_URL: "postgres://${DB_USER:-user}:${DB_PASS:-pass}@postgres:${DB_PORT:-5432}/${DB_NAME:-test_db}?sslmode=disable"
+    ports:
+      - "${PGWEB_PORT:-8081}:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pg_data:
