@@ -1,4 +1,3 @@
--- +goose Up
 CREATE TYPE transport AS ENUM (
     'foot',
     'bike',
@@ -112,18 +111,3 @@ CREATE TABLE IF NOT EXISTS orders_tracking
     deleted_at  timestamptz,
     PRIMARY KEY (order_id, status)
 );
-
-
--- +goose Down
-DROP TABLE IF EXISTS restaurants;
-DROP TABLE IF EXISTS menu_items;
-DROP TABLE IF EXISTS orders;
-DROP TABLE IF EXISTS orders_menu_items;
-DROP TABLE IF EXISTS orders_tracking;
-DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS couriers;
-DROP TABLE IF EXISTS clients;
-
-DROP TYPE IF EXISTS transport CASCADE;
-DROP TYPE IF EXISTS order_status CASCADE;
-DROP TYPE IF EXISTS cuisine CASCADE;

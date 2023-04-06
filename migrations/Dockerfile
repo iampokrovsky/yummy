@@ -5,7 +5,7 @@ RUN apk update && \
     rm -rf /var/cache/apk/*
 ADD https://github.com/pressly/goose/releases/download/v3.7.0/goose_linux_x86_64 /bin/goose
 RUN chmod +x /bin/goose
-COPY *.sql /migrations/
+RUN mkdir -p /migrations
+#COPY *.sql /migrations/
 WORKDIR /migrations
-ENTRYPOINT ["tail"]
-CMD ["-f", "/dev/null"]
+CMD ["tail", "-f", "/dev/null"]

@@ -28,6 +28,8 @@ services:
       DB_USER: "${DB_USER:-user}"
       DB_PASS: "${DB_PASS:-pass}"
       DB_NAME: "${DB_NAME:-test_db}"
+    volumes:
+      - ./migrations:/migrations # TODO Убрать
     depends_on:
       postgres:
         condition: service_healthy
