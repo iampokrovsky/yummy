@@ -10,7 +10,7 @@ CREATE TYPE order_status AS ENUM (
     'received',
     'pending',
     'preparing',
-    'shipped',
+    'shipping',
     'completed',
     'cancelled',
     'failed'
