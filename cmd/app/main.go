@@ -1,17 +1,18 @@
 package main
 
 import (
-	"fmt"
-	"github.com/kr/pretty"
 	"hw-5/config"
+	"hw-5/internal/app"
 	"log"
 )
 
 func main() {
+	// Configuration
 	cfg, err := config.New()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Config error: %s", err)
 	}
 
-	fmt.Printf("%# v", pretty.Formatter(cfg))
+	// Run
+	app.Run(cfg)
 }

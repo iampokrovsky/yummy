@@ -18,7 +18,7 @@ type DB struct {
 	SSLMode  string `env:"DB_SSL"`
 }
 
-func (db *DB) GetURL() string {
+func (db *DB) GetDSN() string {
 	return fmt.Sprintf("host=%s port=%s dbname=%s user=%s password=%s sslmode=%s", db.Host, db.Port, db.DBName, db.User, db.Password, db.SSLMode)
 }
 

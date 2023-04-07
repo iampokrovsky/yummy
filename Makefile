@@ -2,7 +2,7 @@ include .env
 
 export MAKEFLAGS="-s"
 
-DB_STRING := "host=postgres user=$(DB_USER) password=$(DB_PASS) dbname=$(DB_NAME) sslmode=disable"
+DB_STRING := "host=$(DB_HOST) user=$(DB_USER) password=$(DB_PASS) dbname=$(DB_NAME) sslmode=$(DB_SSL)"
 
 .PHONY: help
 
@@ -37,8 +37,8 @@ migrate-down: ### Migrate down
 
 test-data: ### Fetch test data
 	docker exec -d postgres mkdir -p /test_data
-	docker cp -q ./tests/test_data.sql postgres:/test_data/test_data.sql
-	docker exec postgres psql -q -U $(DB_USER) -d $(DB_NAME) -f /test_data/test_data.sql
+	docker cp -q ./test/test_data.sql postgres:/test/test_data.sql
+	docker exec postgres psql -q -U $(DB_USER) -d $(DB_NAME) -f /test/test_data.sql
 .PHONY: test-data
 
 # TODO убрать
@@ -47,9 +47,9 @@ reload:
 	make migrate-up
 	make test-data
 .PHONY: reload
-
-# TODO убрать
-run:
-	DB_USER=user go run ./cmd
-.PHONY: run
-
+#
+## TODO убрать
+#run:
+#	go run ./cmd/app
+#.PHONY: run
+#
