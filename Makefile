@@ -40,3 +40,12 @@ test-data: ### Fetch test data
 	docker cp -q ./tests/test_data.sql postgres:/test_data/test_data.sql
 	docker exec postgres psql -q -U $(DB_USER) -d $(DB_NAME) -f /test_data/test_data.sql
 .PHONY: test-data
+
+###
+
+# TODO убрать
+reload:
+	make migrate-down
+	make migrate-up
+	make test-data
+.PHONY: reload

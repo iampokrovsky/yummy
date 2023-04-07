@@ -167,7 +167,7 @@ FROM generate_series(1, 50) AS i;
 INSERT INTO clients (user_id, address)
 SELECT i,
        get_random_address()
-FROM generate_series(51, 100) AS i;
+FROM generate_series(51, 150) AS i;
 
 -- Insert orders
 INSERT INTO orders (client_id, courier_id, restaurant_id)
@@ -199,7 +199,7 @@ BEGIN
 END
 $$;
 
--- Insert menu items for orders
+-- Insert random menu items for orders
 INSERT INTO orders_menu_items (order_id, menu_item_id, amount)
 SELECT order_id,
        get_random_menu_item_id(group_id, order_id),
@@ -207,7 +207,6 @@ SELECT order_id,
 FROM (SELECT (row_number() OVER () / 1000) % 5                        AS group_id,
              row_number() OVER () % (SELECT COUNT(*) FROM orders) + 1 AS order_id
       FROM generate_series(1, 5000)) AS i;
-
 
 -- Insert tracking for orders
 INSERT INTO orders_tracking (order_id, status, finished_at)
