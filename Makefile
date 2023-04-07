@@ -9,9 +9,9 @@ DB_STRING := "host=postgres user=$(DB_USER) password=$(DB_PASS) dbname=$(DB_NAME
 help: ## Display this help screen
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
-run: ### Run containers
+start: ### Run containers
 	docker compose up --build -d
-.PHONY: run
+.PHONY: start
 
 stop: ### Down containers
 	docker compose down --remove-orphans

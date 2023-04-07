@@ -2,9 +2,20 @@ version: "3.9"
 
 services:
 
+  app:
+    image: hw5
+    build: .
+    container_name: app
+    env_file: .env
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   postgres:
     image: postgres
-    container_name: postgres
+    container_name: db
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
       interval: 10s
@@ -39,7 +50,7 @@ services:
     container_name: pgweb
     restart: always
     environment:
-      PGWEB_DATABASE_URL: "postgres://${DB_USER:-user}:${DB_PASS:-pass}@postgres:${DB_PORT:-5432}/${DB_NAME:-test_db}?sslmode=disable"
+      PGWEB_DATABASE_URL: "db://${DB_USER:-user}:${DB_PASS:-pass}@db:${DB_PORT:-5432}/${DB_NAME:-test_db}?sslmode=disable"
     ports:
       - "${PGWEB_PORT:-8081}:8081"
     depends_on:
