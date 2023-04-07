@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"github.com/ilyakaznacheev/cleanenv"
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -23,7 +24,11 @@ func (db *DB) GetDSN() string {
 }
 
 func New() (Config, error) {
-	cfg := Config{}
+	var cfg Config
+
+	if err := godotenv.Load(); err != nil {
+		return cfg, fmt.Errorf("config error: %w", err)
+	}
 
 	if err := cleanenv.ReadEnv(&cfg); err != nil {
 		return cfg, fmt.Errorf("config error: %w", err)
