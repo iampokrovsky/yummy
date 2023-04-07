@@ -21,9 +21,9 @@ logs: ### View output from containers
 	docker compose logs -f
 .PHONY: logs
 
-clear: ### Remove docker volumes
+clean: ### Remove docker volumes
 	docker volume rm $(shell docker volume ls -q -f name=hw-5_)
-.PHONY: clear
+.PHONY: clean
 
 migrate-up: ### Migrate up
 	docker exec goose \
@@ -41,11 +41,15 @@ test-data: ### Fetch test data
 	docker exec postgres psql -q -U $(DB_USER) -d $(DB_NAME) -f /test_data/test_data.sql
 .PHONY: test-data
 
-###
-
 # TODO убрать
 reload:
 	make migrate-down
 	make migrate-up
 	make test-data
 .PHONY: reload
+
+# TODO убрать
+run:
+	DB_USER=user go run ./cmd
+.PHONY: run
+

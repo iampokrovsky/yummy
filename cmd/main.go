@@ -3,12 +3,15 @@ package main
 import (
 	"fmt"
 	"github.com/kr/pretty"
+	"hw-5/config"
+	"log"
 )
 
 func main() {
-	type myType struct {
-		a, b int
+	cfg, err := config.New()
+	if err != nil {
+		log.Fatal(err)
 	}
-	var x = []myType{{1, 2}, {3, 4}, {5, 6}}
-	fmt.Printf("%# v", pretty.Formatter(x))
+
+	fmt.Printf("%# v", pretty.Formatter(cfg))
 }

@@ -15,7 +15,7 @@ services:
 
   postgres:
     image: postgres
-    container_name: db
+    container_name: postgres
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
       interval: 10s
@@ -23,11 +23,11 @@ services:
       retries: 5
     restart: always
     environment:
-      POSTGRES_USER: "${DB_USER:-user}"
-      POSTGRES_PASSWORD: "${DB_PASS:-pass}"
-      POSTGRES_DB: "${DB_NAME:-test_db}"
+      POSTGRES_USER: "${DB_USER}"
+      POSTGRES_PASSWORD: "${DB_PASS}"
+      POSTGRES_DB: "${DB_NAME}"
     ports:
-      - "${DB_PORT:-5432}:5432"
+      - "${DB_PORT}:5432"
     volumes:
       - pg_data:/var/lib/postgresql/data
 
@@ -35,10 +35,7 @@ services:
     image: goose
     build: ./migrations
     container_name: goose
-    environment:
-      DB_USER: "${DB_USER:-user}"
-      DB_PASS: "${DB_PASS:-pass}"
-      DB_NAME: "${DB_NAME:-test_db}"
+    env_file: .env
     volumes:
       - ./migrations:/migrations # TODO Убрать
     depends_on:
@@ -50,9 +47,9 @@ services:
     container_name: pgweb
     restart: always
     environment:
-      PGWEB_DATABASE_URL: "db://${DB_USER:-user}:${DB_PASS:-pass}@db:${DB_PORT:-5432}/${DB_NAME:-test_db}?sslmode=disable"
+      PGWEB_DATABASE_URL: "${DB_HOST}://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=${DB_SSL}"
     ports:
-      - "${PGWEB_PORT:-8081}:8081"
+      - "${PGWEB_PORT}:8081"
     depends_on:
       postgres:
         condition: service_healthy
