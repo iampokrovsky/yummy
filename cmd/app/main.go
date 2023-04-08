@@ -2,7 +2,6 @@ package main
 
 import (
 	"hw-5/config"
-	"hw-5/internal/app"
 	"log"
 )
 
@@ -14,5 +13,5 @@ func main() {
 	}
 
 	// Run
-	app.Run(cfg)
+	run(cfg)
 }
