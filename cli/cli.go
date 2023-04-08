@@ -36,7 +36,6 @@ type CLI struct {
 	restaurantService RestaurantService
 	menuService       MenuService
 	reader            *bufio.Reader
-	//writer            *bufio.Writer
 }
 
 func NewCLI(restaurantService RestaurantService, menuService MenuService) *CLI {
@@ -44,7 +43,6 @@ func NewCLI(restaurantService RestaurantService, menuService MenuService) *CLI {
 		restaurantService: restaurantService,
 		menuService:       menuService,
 		reader:            bufio.NewReader(os.Stdin),
-		//writer:            bufio.NewWriter(os.Stdout),
 	}
 }
 
@@ -61,8 +59,9 @@ func (cli *CLI) Run(ctx context.Context) {
 		}
 		cmd = strings.TrimSpace(cmd)
 
-		wg.Add(1)
-		cli.restaurantServiceHandler(ctx, &wg, cmd)
+		wg.Add(2)
+		go cli.restaurantServiceHandler(ctx, &wg, cmd)
+		go cli.menuServiceHandler(ctx, &wg, cmd)
 		wg.Wait()
 	}
 }

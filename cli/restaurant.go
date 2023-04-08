@@ -26,7 +26,7 @@ func (cli *CLI) restaurantServiceHandler(ctx context.Context, wg *sync.WaitGroup
 	case "restore restaurant":
 		cli.restoreRestaurant(ctx)
 	default:
-		fmt.Println("Invalid command.")
+		return
 	}
 
 }
@@ -80,7 +80,14 @@ func (cli *CLI) getRestaurant(ctx context.Context) {
 	}
 	idStr = strings.TrimSpace(idStr)
 
-	id, err := strconv.ParseInt(idStr, 10, 64)
+	var id int64
+	if idStr != "" {
+		id, err = strconv.ParseInt(idStr, 10, 64)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+	}
 
 	restaurant, err := cli.restaurantService.GetByID(ctx, rest_model.ID(id))
 	if err != nil {
@@ -113,7 +120,14 @@ func (cli *CLI) updateRestaurant(ctx context.Context) {
 	}
 	idStr = strings.TrimSpace(idStr)
 
-	id, err := strconv.ParseInt(idStr, 10, 64)
+	var id int64
+	if idStr != "" {
+		id, err = strconv.ParseInt(idStr, 10, 64)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+	}
 
 	fmt.Println("Enter restaurant name:")
 	name, err := cli.reader.ReadString('\n')
@@ -164,7 +178,14 @@ func (cli *CLI) deleteRestaurant(ctx context.Context) {
 	}
 	idStr = strings.TrimSpace(idStr)
 
-	id, err := strconv.ParseInt(idStr, 10, 64)
+	var id int64
+	if idStr != "" {
+		id, err = strconv.ParseInt(idStr, 10, 64)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+	}
 
 	ok, err := cli.restaurantService.Delete(ctx, rest_model.ID(id))
 	if !ok || err != nil {
@@ -184,7 +205,14 @@ func (cli *CLI) restoreRestaurant(ctx context.Context) {
 	}
 	idStr = strings.TrimSpace(idStr)
 
-	id, err := strconv.ParseInt(idStr, 10, 64)
+	var id int64
+	if idStr != "" {
+		id, err = strconv.ParseInt(idStr, 10, 64)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+	}
 
 	ok, err := cli.restaurantService.Restore(ctx, rest_model.ID(id))
 	if !ok || err != nil {
