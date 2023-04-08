@@ -44,7 +44,7 @@ func (r *PostgresRepo) Create(ctx context.Context, item model.MenuItem) (model.I
 	return id, err
 }
 
-// GetByID returns menu item by ID
+// GetByID returns a menu item by ID
 func (r *PostgresRepo) GetByID(ctx context.Context, id model.ID) (model.MenuItem, error) {
 	var item model.MenuItem
 
@@ -76,7 +76,7 @@ func (r *PostgresRepo) ListByName(ctx context.Context, name string) ([]model.Men
 	return items, err
 }
 
-// Update updates menu item
+// Update updates a menu item
 func (r *PostgresRepo) Update(ctx context.Context, item model.MenuItem) (bool, error) {
 	var query strings.Builder
 	query.WriteString(`UPDATE menu_items SET deleted_at = NULL, updated_at = $1`)
@@ -101,7 +101,7 @@ func (r *PostgresRepo) Update(ctx context.Context, item model.MenuItem) (bool, e
 	return result.RowsAffected() > 0, err
 }
 
-// Delete removes menu item by ID
+// Delete removes a menu item by ID
 func (r *PostgresRepo) Delete(ctx context.Context, id model.ID) (bool, error) {
 	query := `UPDATE menu_items SET deleted_at = $1 WHERE id = $2`
 	result, err := r.db.Exec(ctx, query, time.Now(), id)
@@ -109,7 +109,7 @@ func (r *PostgresRepo) Delete(ctx context.Context, id model.ID) (bool, error) {
 	return result.RowsAffected() > 0, err
 }
 
-// Restore restores menu item by ID
+// Restore restores a menu item by ID
 func (r *PostgresRepo) Restore(ctx context.Context, id model.ID) (bool, error) {
 	query := `UPDATE menu_items SET deleted_at = NULL, updated_at = $1 WHERE id = $2`
 	result, err := r.db.Exec(ctx, query, time.Now(), id)
