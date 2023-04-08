@@ -9,15 +9,6 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
-// TODO Посмотреть, какие методы могут быть нужны
-type DB interface {
-	Select(ctx context.Context, dest interface{}, query string, args ...interface{}) error
-	Get(ctx context.Context, dest interface{}, query string, args ...interface{}) error
-	Exec(ctx context.Context, query string, args ...interface{}) (pgconn.CommandTag, error)
-	ExecQueryRow(ctx context.Context, query string, args ...interface{}) pgx.Row
-	GetPool(ctx context.Context) *pgxpool.Pool
-}
-
 type Database struct {
 	pool *pgxpool.Pool
 }
@@ -43,6 +34,6 @@ func (db Database) Exec(ctx context.Context, query string, args ...interface{}) 
 	return db.pool.Exec(ctx, query, args...)
 }
 
-func (db Database) ExecQueryRow(ctx context.Context, query string, args ...interface{}) pgx.Row {
+func (db Database) QueryRow(ctx context.Context, query string, args ...interface{}) pgx.Row {
 	return db.pool.QueryRow(ctx, query, args...)
 }

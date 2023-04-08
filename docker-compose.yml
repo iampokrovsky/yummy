@@ -4,7 +4,7 @@ services:
 
   postgres:
     image: postgres
-    container_name: pgsql
+    container_name: db
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
       interval: 10s
@@ -36,7 +36,7 @@ services:
     container_name: pgweb
     restart: always
     environment:
-      PGWEB_DATABASE_URL: "${DB_HOST}://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=${DB_SSL}"
+      PGWEB_DATABASE_URL: "$postgres://${DB_USER}:${DB_PASS}@$postgres:${DB_PORT}/${DB_NAME}?sslmode=${DB_SSL}"
     ports:
       - "${PGWEB_PORT}:8081"
     depends_on:
