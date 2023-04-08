@@ -27,7 +27,7 @@ type PostgresRepo struct {
 	db DB
 }
 
-// NewPostgresRepo returns a pointer to a new instance of the PostgresRepo type
+// NewPostgresRepo returns a pointer to a new instance of the PostgresRepo
 func NewPostgresRepo(db DB) *PostgresRepo {
 	return &PostgresRepo{
 		db: db,
@@ -98,12 +98,12 @@ func (r *PostgresRepo) Update(ctx context.Context, item model.Restaurant) (bool,
 	}
 
 	if item.Address != "" {
-		query.WriteString(`, price = $3`)
+		query.WriteString(`, address = $3`)
 		params = append(params, item.Address)
 	}
 
 	if item.Cuisine != "" {
-		query.WriteString(`, price = $4`)
+		query.WriteString(`, cuisine = $4`)
 		params = append(params, item.Cuisine)
 	}
 

@@ -27,7 +27,7 @@ type PostgresRepo struct {
 	db DB
 }
 
-// NewPostgresRepo returns a pointer to a new instance of the PostgresRepo type
+// NewPostgresRepo returns a pointer to a new instance of the PostgresRepo
 func NewPostgresRepo(db DB) *PostgresRepo {
 	return &PostgresRepo{
 		db: db,

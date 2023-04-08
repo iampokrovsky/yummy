@@ -25,6 +25,7 @@ type Service struct {
 	repo Repo
 }
 
+// NewService returns a pointer to a new instance of the Service
 func NewService(repo Repo) *Service {
 	return &Service{
 		repo: repo,
