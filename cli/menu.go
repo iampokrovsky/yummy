@@ -32,6 +32,23 @@ func (cli *CLI) menuServiceHandler(ctx context.Context, wg *sync.WaitGroup, cmd 
 }
 
 func (cli *CLI) createMenuItem(ctx context.Context) {
+	fmt.Println("Enter restaurant ID:")
+	restIdStr, err := cli.reader.ReadString('\n')
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	restIdStr = strings.TrimSpace(restIdStr)
+
+	var restId int64
+	if restIdStr != "" {
+		restId, err = strconv.ParseInt(restIdStr, 10, 64)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+	}
+
 	fmt.Println("Enter menu item name:")
 	name, err := cli.reader.ReadString('\n')
 	if err != nil {
@@ -58,8 +75,9 @@ func (cli *CLI) createMenuItem(ctx context.Context) {
 	}
 
 	newItem := menu_model.MenuItem{
-		Name:  name,
-		Price: price,
+		RestaurantID: menu_model.ID(restId),
+		Name:         name,
+		Price:        price,
 	}
 
 	id, err := cli.menuService.Create(ctx, newItem)
