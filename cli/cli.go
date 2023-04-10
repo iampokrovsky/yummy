@@ -6,8 +6,8 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	menu_model "hw-5/internal/app/menu/model"
-	rest_model "hw-5/internal/app/restaurant/model"
+	menumodel "hw-5/internal/app/menu/model"
+	restmodel "hw-5/internal/app/restaurant/model"
 	"log"
 	"os"
 )
@@ -19,24 +19,24 @@ var (
 )
 
 type RestaurantService interface {
-	Create(ctx context.Context, item rest_model.Restaurant) (rest_model.ID, error)
-	GetByID(ctx context.Context, id rest_model.ID) (rest_model.Restaurant, error)
-	List(ctx context.Context) ([]rest_model.Restaurant, error)
-	ListByName(ctx context.Context, name string) ([]rest_model.Restaurant, error)
-	ListByCuisine(ctx context.Context, cuisine string) ([]rest_model.Restaurant, error)
-	Update(ctx context.Context, item rest_model.Restaurant) (bool, error)
-	Delete(ctx context.Context, id rest_model.ID) (bool, error)
-	Restore(ctx context.Context, id rest_model.ID) (bool, error)
+	Create(ctx context.Context, item restmodel.Restaurant) (restmodel.ID, error)
+	GetByID(ctx context.Context, id restmodel.ID) (restmodel.Restaurant, error)
+	List(ctx context.Context) ([]restmodel.Restaurant, error)
+	ListByName(ctx context.Context, name string) ([]restmodel.Restaurant, error)
+	ListByCuisine(ctx context.Context, cuisine string) ([]restmodel.Restaurant, error)
+	Update(ctx context.Context, item restmodel.Restaurant) (bool, error)
+	Delete(ctx context.Context, id restmodel.ID) (bool, error)
+	Restore(ctx context.Context, id restmodel.ID) (bool, error)
 }
 
 type MenuService interface {
-	Create(ctx context.Context, item menu_model.MenuItem) (menu_model.ID, error)
-	GetByID(ctx context.Context, id menu_model.ID) (menu_model.MenuItem, error)
-	ListByRestaurantID(ctx context.Context, restId menu_model.ID) ([]menu_model.MenuItem, error)
-	ListByName(ctx context.Context, name string) ([]menu_model.MenuItem, error)
-	Update(ctx context.Context, item menu_model.MenuItem) (bool, error)
-	Delete(ctx context.Context, id menu_model.ID) (bool, error)
-	Restore(ctx context.Context, id menu_model.ID) (bool, error)
+	Create(ctx context.Context, item menumodel.MenuItem) (menumodel.ID, error)
+	GetByID(ctx context.Context, id menumodel.ID) (menumodel.MenuItem, error)
+	ListByRestaurantID(ctx context.Context, restId menumodel.ID) ([]menumodel.MenuItem, error)
+	ListByName(ctx context.Context, name string) ([]menumodel.MenuItem, error)
+	Update(ctx context.Context, item menumodel.MenuItem) (bool, error)
+	Delete(ctx context.Context, id menumodel.ID) (bool, error)
+	Restore(ctx context.Context, id menumodel.ID) (bool, error)
 }
 
 type CLI struct {
@@ -45,6 +45,7 @@ type CLI struct {
 	reader            *bufio.Reader
 }
 
+// NewCLI returns new CLI object
 func NewCLI(restaurantService RestaurantService, menuService MenuService) *CLI {
 	return &CLI{
 		restaurantService: restaurantService,
@@ -53,6 +54,7 @@ func NewCLI(restaurantService RestaurantService, menuService MenuService) *CLI {
 	}
 }
 
+// HandleCmd processes and executes terminal commands
 func (cli *CLI) HandleCmd(ctx context.Context) {
 	actionDesc := "Action: create, get, list, update, delete, restore"
 	action := flag.String("a", "", actionDesc)
@@ -69,18 +71,18 @@ func (cli *CLI) HandleCmd(ctx context.Context) {
 	flag.Parse()
 
 	targets := []string{"menu", "restaurant"}
-	tg, err := validateParam(ctx, targets, *target, *targetFull)
+	tg, err := validateParam(targets, *target, *targetFull)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	actions := []string{"create", "get", "list", "update", "delete", "restore"}
-	act, err := validateParam(ctx, actions, *action, *actionFull)
+	act, err := validateParam(actions, *action, *actionFull)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	dt, err := validateParam(ctx, nil, *data, *dataFull)
+	dt, err := validateParam(nil, *data, *dataFull)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -91,7 +93,7 @@ func (cli *CLI) HandleCmd(ctx context.Context) {
 		case "create":
 			cli.createMenuItem(ctx, dt)
 		case "get":
-			cli.getMenuItem(ctx, dt)
+			cli.getMenuItem(dt)
 		case "list":
 			cli.listMenuItems(ctx, dt)
 		case "update":
@@ -108,7 +110,7 @@ func (cli *CLI) HandleCmd(ctx context.Context) {
 		case "get":
 			cli.getRestaurant(ctx, dt)
 		case "list":
-			cli.listRestaurants(ctx, dt)
+			cli.listRestaurants(ctx)
 		case "update":
 			cli.updateRestaurant(ctx, dt)
 		case "delete":
@@ -119,7 +121,7 @@ func (cli *CLI) HandleCmd(ctx context.Context) {
 	}
 }
 
-func validateParam(ctx context.Context, validParams []string, param, fullParam string) (string, error) {
+func validateParam(validParams []string, param, fullParam string) (string, error) {
 	if param == "" && fullParam == "" {
 		return "", ErrorNotEnoughParams
 	}

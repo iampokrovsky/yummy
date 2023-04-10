@@ -15,7 +15,7 @@ import (
 func run(cfg config.Config) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	db, err := postgres.New(ctx, cfg.DB.GetDSN())
+	db, err := postgres.NewDB(ctx, cfg.DB.GetDSN())
 	if err != nil {
 		log.Fatal(err)
 	}

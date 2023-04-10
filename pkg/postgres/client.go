@@ -6,7 +6,7 @@ import (
 )
 
 // New returns pointer to instance of Database
-func New(ctx context.Context, dsn string) (*Database, error) {
+func NewDB(ctx context.Context, dsn string) (*Database, error) {
 	pool, err := pgxpool.Connect(ctx, dsn)
 	if err != nil {
 		return nil, err

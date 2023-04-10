@@ -23,7 +23,7 @@ func (cli *CLI) createMenuItem(ctx context.Context, data string) {
 	fmt.Printf("Menu item created with ID %d.\n", id)
 }
 
-func (cli *CLI) getMenuItem(ctx context.Context, data string) {
+func (cli *CLI) getMenuItem(data string) {
 	var itemRaw menumodel.MenuItem
 	if err := json.Unmarshal([]byte(data), &itemRaw); err != nil {
 		log.Fatal("error parsing JSON:", err)
@@ -125,7 +125,7 @@ func (cli *CLI) getRestaurant(ctx context.Context, data string) {
 	fmt.Printf("Restaurant: %+v\n", restaurant)
 }
 
-func (cli *CLI) listRestaurants(ctx context.Context, data string) {
+func (cli *CLI) listRestaurants(ctx context.Context) {
 	restaurants, err := cli.restaurantService.List(ctx)
 	if err != nil {
 		log.Fatalf("failed to list restaurants: %v\n", err)

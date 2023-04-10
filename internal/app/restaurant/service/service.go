@@ -2,12 +2,7 @@ package service
 
 import (
 	"context"
-	"errors"
 	"hw-5/internal/app/restaurant/model"
-)
-
-var (
-	ErrObjectNotFound = errors.New("object not found")
 )
 
 type Repo interface {

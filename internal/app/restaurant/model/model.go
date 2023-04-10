@@ -7,20 +7,6 @@ import (
 
 type Cuisine string
 
-const (
-	CuisineItalian  Cuisine = "Italian"
-	CuisineChinese          = "Chinese"
-	CuisineMexican          = "Mexican"
-	CuisineJapanese         = "Japanese"
-	CuisineIndian           = "Indian"
-	CuisineThai             = "Thai"
-	CuisineFrench           = "French"
-	CuisineGreek            = "Greek"
-	CuisineKorean           = "Korean"
-	CuisineRussian          = "Russian"
-	CuisineGeorgian         = "Georgian"
-)
-
 type ID int64
 
 type Restaurant struct {
