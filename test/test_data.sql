@@ -226,7 +226,7 @@ SELECT i, 'preparing'::order_status, now()
 FROM generate_series(1, (SELECT COUNT(*) FROM orders) / 4) AS i;
 
 INSERT INTO orders_tracking (order_id, status, finished_at)
-SELECT i, 'shipped'::order_status, now()
+SELECT i, 'shipping'::order_status, now()
 FROM generate_series(1, (SELECT COUNT(*) FROM orders) / 5) AS i;
 
 INSERT INTO orders_tracking (order_id, status, finished_at)

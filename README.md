@@ -39,23 +39,16 @@ make test-data
 make run
 ```
 
+В Makefile закомментированы все доступные на данный момент команды. Для тестирования можно по очереди раскомментировать
+каждую из них или написать свою.
+
 Запустится REPL. На данный момент доступно несколько команд для "Меню":
 
-- `create menu item`
-- `get menu item`
-- `list menu items`
-- `update menu item`
-- `delete menu item`
-- `restore menu item`
-
-И несколько для ресторанов:
-
-- `create restaurant`
-- `get restaurant`
-- `list restaurants`
-- `update restaurant`
-- `delete restaurant`
-- `restore restaurant`
+|                  |                                                                                                      |
+|------------------|------------------------------------------------------------------------------------------------------|
+| `-a`, `--action` | Действие: `create`, `get`, `list`, `update`, `delete`, `restore`                                     |
+| `-t`, `--target` | Сущность в БД, к которой будут применяться изменения (на данный момент только `menu` и `restaurant`) |
+| -`d`, `--data`   | Данные в формате JSON (если данные не нужны, передать пустой JSON - `{}`)                            |
 
 ## План подключения кэша
 

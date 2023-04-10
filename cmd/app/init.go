@@ -4,10 +4,10 @@ import (
 	"context"
 	"hw-5/cli"
 	"hw-5/config"
-	menu_repo "hw-5/internal/app/menu/repo"
-	menu_service "hw-5/internal/app/menu/service"
-	rest_repo "hw-5/internal/app/restaurant/repo"
-	rest_service "hw-5/internal/app/restaurant/service"
+	menurepo "hw-5/internal/app/menu/repo"
+	menuserv "hw-5/internal/app/menu/service"
+	restrepo "hw-5/internal/app/restaurant/repo"
+	restserv "hw-5/internal/app/restaurant/service"
 	"hw-5/pkg/postgres"
 	"log"
 )
@@ -15,19 +15,17 @@ import (
 func run(cfg config.Config) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-
 	db, err := postgres.New(ctx, cfg.DB.GetDSN())
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	restaurantRepo := rest_repo.NewPostgresRepo(db)
-	menuRepo := menu_repo.NewPostgresRepo(db)
+	restaurantRepo := restrepo.NewPostgresRepo(db)
+	restaurantService := restserv.NewService(restaurantRepo)
 
-	restaurantService := rest_service.NewService(restaurantRepo)
-	menuService := menu_service.NewService(menuRepo)
+	menuRepo := menurepo.NewPostgresRepo(db)
+	menuService := menuserv.NewService(menuRepo)
 
 	console := cli.NewCLI(restaurantService, menuService)
-
-	console.Run(ctx)
+	console.HandleCmd(ctx)
 }

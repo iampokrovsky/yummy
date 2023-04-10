@@ -3,12 +3,19 @@ package cli
 import (
 	"bufio"
 	"context"
+	"errors"
+	"flag"
 	"fmt"
 	menu_model "hw-5/internal/app/menu/model"
 	rest_model "hw-5/internal/app/restaurant/model"
+	"log"
 	"os"
-	"strings"
-	"sync"
+)
+
+var (
+	ErrorInvalidParam    = errors.New("invalid param")
+	ErrorRepeatedParams  = errors.New("repeated parameters")
+	ErrorNotEnoughParams = errors.New("not enough parameters")
 )
 
 type RestaurantService interface {
@@ -46,22 +53,101 @@ func NewCLI(restaurantService RestaurantService, menuService MenuService) *CLI {
 	}
 }
 
-func (cli *CLI) Run(ctx context.Context) {
-	var wg sync.WaitGroup
+func (cli *CLI) HandleCmd(ctx context.Context) {
+	actionDesc := "Action: create, get, list, update, delete, restore"
+	action := flag.String("a", "", actionDesc)
+	actionFull := flag.String("action", "", actionDesc)
 
-	for {
-		fmt.Println("Enter command (create, get, list, update, delete, restore) and object (restaurant, menu):")
+	targetDesc := "Action target: restaurant or menu"
+	target := flag.String("t", "", targetDesc)
+	targetFull := flag.String("target", "", targetDesc)
 
-		cmd, err := cli.reader.ReadString('\n')
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		cmd = strings.TrimSpace(cmd)
+	dataDesc := "Data in JSON format"
+	data := flag.String("d", "", dataDesc)
+	dataFull := flag.String("data", "", dataDesc)
 
-		wg.Add(2)
-		go cli.restaurantServiceHandler(ctx, &wg, cmd)
-		go cli.menuServiceHandler(ctx, &wg, cmd)
-		wg.Wait()
+	flag.Parse()
+
+	targets := []string{"menu", "restaurant"}
+	tg, err := validateParam(ctx, targets, *target, *targetFull)
+	if err != nil {
+		log.Fatal(err)
 	}
+
+	actions := []string{"create", "get", "list", "update", "delete", "restore"}
+	act, err := validateParam(ctx, actions, *action, *actionFull)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	dt, err := validateParam(ctx, nil, *data, *dataFull)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	switch tg {
+	case "menu":
+		switch act {
+		case "create":
+			cli.createMenuItem(ctx, dt)
+		case "get":
+			cli.getMenuItem(ctx, dt)
+		case "list":
+			cli.listMenuItems(ctx, dt)
+		case "update":
+			cli.updateMenuItem(ctx, dt)
+		case "delete":
+			cli.deleteMenuItem(ctx, dt)
+		case "restore":
+			cli.restoreMenuItem(ctx, dt)
+		}
+	case "restaurant":
+		switch act {
+		case "create":
+			cli.createRestaurant(ctx, dt)
+		case "get":
+			cli.getRestaurant(ctx, dt)
+		case "list":
+			cli.listRestaurants(ctx, dt)
+		case "update":
+			cli.updateRestaurant(ctx, dt)
+		case "delete":
+			cli.deleteRestaurant(ctx, dt)
+		case "restore":
+			cli.restoreRestaurant(ctx, dt)
+		}
+	}
+}
+
+func validateParam(ctx context.Context, validParams []string, param, fullParam string) (string, error) {
+	if param == "" && fullParam == "" {
+		return "", ErrorNotEnoughParams
+	}
+
+	if param != "" && fullParam != "" {
+		return "", fmt.Errorf("%v: -%s and --%s", ErrorRepeatedParams, param, fullParam)
+	}
+
+	if param == "" && fullParam != "" {
+		param = fullParam
+	}
+
+	if validParams == nil {
+		return param, nil
+	}
+
+	var isValid bool
+
+	for _, valid := range validParams {
+		if param == valid {
+			isValid = true
+			break
+		}
+	}
+
+	if !isValid {
+		return "", fmt.Errorf("%v: %s", ErrorInvalidParam, param)
+	}
+
+	return param, nil
 }

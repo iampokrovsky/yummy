@@ -33,7 +33,7 @@ func (r *Service) Create(ctx context.Context, item model.MenuItem) (model.ID, er
 
 // GetByID returns a menu item by ID
 func (r *Service) GetByID(ctx context.Context, id model.ID) (model.MenuItem, error) {
-	return r.GetByID(ctx, id)
+	return r.repo.GetByID(ctx, id)
 }
 
 // ListByRestaurantID returns menu items by restaurant ID
@@ -43,7 +43,7 @@ func (r *Service) ListByRestaurantID(ctx context.Context, restId model.ID) ([]mo
 
 // ListByName returns menu items by name match
 func (r *Service) ListByName(ctx context.Context, name string) ([]model.MenuItem, error) {
-	return r.ListByName(ctx, name)
+	return r.repo.ListByName(ctx, name)
 }
 
 // Update updates a menu item
