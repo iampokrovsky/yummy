@@ -1,0 +1,50 @@
+##
+## Specific to .dockerignore
+##
+
+# Common
+contrib/
+*.md
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Git
+.git/
+.gitignore
+
+
+##
+## Common with .gitignore
+##
+
+# IDE
+.idea
+.vscode
+
+# Temporary files
+*~
+*#
+.#*
+
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+.DS_Store
+bin/
+dist/
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Vendors
+vendor/
+node_modules/
