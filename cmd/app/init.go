@@ -2,30 +2,35 @@ package main
 
 import (
 	"context"
-	"hw-5/cli"
-	"hw-5/config"
-	menurepo "hw-5/internal/app/menu/repo"
-	menuserv "hw-5/internal/app/menu/service"
-	restrepo "hw-5/internal/app/restaurant/repo"
-	restserv "hw-5/internal/app/restaurant/service"
-	"hw-5/pkg/postgres"
 	"log"
+	"yummy/cli"
+	"yummy/config"
+	menurepo "yummy/internal/app/menu/repo"
+	menuservice "yummy/internal/app/menu/service"
+	restrepo "yummy/internal/app/restaurant/repo"
+	restservice "yummy/internal/app/restaurant/service"
+	"yummy/pkg/postgres"
 )
 
 func run(cfg config.Config) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
+
+	// Init DB
 	db, err := postgres.NewDB(ctx, cfg.DB.GetDSN())
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	restaurantRepo := restrepo.NewPostgresRepo(db)
-	restaurantService := restserv.NewService(restaurantRepo)
+	// Init restaurant service
+	restRepo := restrepo.NewPostgresRepo(db)
+	restService := restservice.NewService(restRepo)
 
+	// Init menu service
 	menuRepo := menurepo.NewPostgresRepo(db)
-	menuService := menuserv.NewService(menuRepo)
+	menuService := menuservice.NewService(menuRepo)
 
-	console := cli.NewCLI(restaurantService, menuService)
-	console.HandleCmd(ctx)
+	// Init CLI
+	cmd := cli.New(restService, menuService)
+	cmd.Execute(ctx)
 }

@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	"hw-5/internal/app/menu/model"
+	"yummy/internal/app/menu/model"
 )
 
 type Repo interface {
