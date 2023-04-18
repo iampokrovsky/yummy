@@ -6,10 +6,10 @@ import (
 	"errors"
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
-	"hw-5/internal/app/restaurant/model"
 	"strconv"
 	"strings"
 	"time"
+	"yummy/internal/app/restaurant/model"
 )
 
 var (

@@ -6,10 +6,10 @@ import (
 	"errors"
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
-	"hw-5/internal/app/menu/model"
 	"strconv"
 	"strings"
 	"time"
+	"yummy/internal/app/menu/model"
 )
 
 var (
@@ -34,7 +34,7 @@ func NewPostgresRepo(db DB) *PostgresRepo {
 	}
 }
 
-// Create creates a menu item
+// Create creates a new menu item
 func (r *PostgresRepo) Create(ctx context.Context, item model.MenuItem) (model.ID, error) {
 	var id model.ID
 

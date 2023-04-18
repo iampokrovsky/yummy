@@ -1,22 +1,15 @@
 package cli
 
 import (
-	"bufio"
 	"context"
-	"errors"
-	"flag"
-	"fmt"
-	menumodel "hw-5/internal/app/menu/model"
-	restmodel "hw-5/internal/app/restaurant/model"
-	"log"
+	"github.com/spf13/cobra"
 	"os"
+	"yummy/cli/utils"
+	menumodel "yummy/internal/app/menu/model"
+	restmodel "yummy/internal/app/restaurant/model"
 )
 
-var (
-	ErrorInvalidParam    = errors.New("invalid param")
-	ErrorRepeatedParams  = errors.New("repeated parameters")
-	ErrorNotEnoughParams = errors.New("not enough parameters")
-)
+type ID uint64
 
 type RestaurantService interface {
 	Create(ctx context.Context, item restmodel.Restaurant) (restmodel.ID, error)
@@ -42,114 +35,86 @@ type MenuService interface {
 type CLI struct {
 	restaurantService RestaurantService
 	menuService       MenuService
-	reader            *bufio.Reader
+	rootCommand       *cobra.Command
 }
 
-// NewCLI returns new CLI object
-func NewCLI(restaurantService RestaurantService, menuService MenuService) *CLI {
-	return &CLI{
+// New initializes the CLI object with service methods and returns a pointer to it.
+func New(restaurantService RestaurantService, menuService MenuService) *CLI {
+	var cli CLI
+
+	cli = CLI{
 		restaurantService: restaurantService,
 		menuService:       menuService,
-		reader:            bufio.NewReader(os.Stdin),
+	}
+
+	cli.initCommands()
+
+	return &cli
+}
+
+// Execute runs the execution of the CLI command.
+func (cli *CLI) Execute(ctx context.Context) {
+	err := cli.rootCommand.ExecuteContext(ctx)
+	if err != nil {
+		os.Exit(1)
 	}
 }
 
-// HandleCmd processes and executes terminal commands
-func (cli *CLI) HandleCmd(ctx context.Context) {
-	actionDesc := "Action: create, get, list, update, delete, restore"
-	action := flag.String("a", "", actionDesc)
-	actionFull := flag.String("action", "", actionDesc)
+func (cli *CLI) initCommands() {
+	rootCmd := cli.rootCmd()
 
-	targetDesc := "Action target: restaurant or menu"
-	target := flag.String("t", "", targetDesc)
-	targetFull := flag.String("target", "", targetDesc)
+	// Turn off "completion" command
+	rootCmd.CompletionOptions.DisableDefaultCmd = true
 
-	dataDesc := "Data in JSON format"
-	data := flag.String("d", "", dataDesc)
-	dataFull := flag.String("data", "", dataDesc)
+	// Set custom help function for root command
+	rootCmd.SetHelpFunc(utils.RootHelpFunc())
 
-	flag.Parse()
+	// Create and configure "add" command
+	addCmd := cli.addCmd()
+	addCmd.AddCommand(cli.addMenuItemCmd(), cli.addRestaurantCmd())
 
-	targets := []string{"menu", "restaurant"}
-	tg, err := validateParam(targets, *target, *targetFull)
-	if err != nil {
-		log.Fatal(err)
+	// Create and configure "get" command
+	getCmd := cli.getCmd()
+	getCmd.AddCommand(cli.getMenuItemCmd(), cli.getRestaurantCmd())
+
+	// Create and configure "list" command
+	listCmd := cli.listCmd()
+	listCmd.AddCommand(cli.listMenuItemsCmd(), cli.listRestaurantsCmd())
+
+	// Create and configure "update" command
+	updateCmd := cli.updateCmd()
+	updateCmd.AddCommand(cli.updateMenuItemCmd(), cli.updateRestaurantCmd())
+
+	// Create and configure "delete" command
+	deleteCmd := cli.deleteCmd()
+	deleteCmd.AddCommand(cli.deleteMenuItemCmd(), cli.deleteRestaurantCmd())
+
+	// Create and configure "restore" command
+	restoreCmd := cli.restoreCmd()
+	restoreCmd.AddCommand(cli.restoreMenuItemCmd(), cli.restoreRestaurantCmd())
+
+	// Create "spell" command
+	spellCmd := cli.spellCmd()
+
+	// Create "fmt" command
+	fmtCmd := cli.fmtCmd()
+
+	commands := []*cobra.Command{
+		addCmd,
+		getCmd,
+		listCmd,
+		updateCmd,
+		deleteCmd,
+		restoreCmd,
+		spellCmd,
+		fmtCmd,
 	}
 
-	actions := []string{"create", "get", "list", "update", "delete", "restore"}
-	act, err := validateParam(actions, *action, *actionFull)
-	if err != nil {
-		log.Fatal(err)
+	for _, cmd := range commands {
+		cmd.SetHelpFunc(utils.DefaultHelpFunc())
+		rootCmd.AddCommand(cmd)
+
 	}
 
-	dt, err := validateParam(nil, *data, *dataFull)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	switch tg {
-	case "menu":
-		switch act {
-		case "create":
-			cli.createMenuItem(ctx, dt)
-		case "get":
-			cli.getMenuItem(dt)
-		case "list":
-			cli.listMenuItems(ctx, dt)
-		case "update":
-			cli.updateMenuItem(ctx, dt)
-		case "delete":
-			cli.deleteMenuItem(ctx, dt)
-		case "restore":
-			cli.restoreMenuItem(ctx, dt)
-		}
-	case "restaurant":
-		switch act {
-		case "create":
-			cli.createRestaurant(ctx, dt)
-		case "get":
-			cli.getRestaurant(ctx, dt)
-		case "list":
-			cli.listRestaurants(ctx)
-		case "update":
-			cli.updateRestaurant(ctx, dt)
-		case "delete":
-			cli.deleteRestaurant(ctx, dt)
-		case "restore":
-			cli.restoreRestaurant(ctx, dt)
-		}
-	}
-}
-
-func validateParam(validParams []string, param, fullParam string) (string, error) {
-	if param == "" && fullParam == "" {
-		return "", ErrorNotEnoughParams
-	}
-
-	if param != "" && fullParam != "" {
-		return "", fmt.Errorf("%v: -%s and --%s", ErrorRepeatedParams, param, fullParam)
-	}
-
-	if param == "" && fullParam != "" {
-		param = fullParam
-	}
-
-	if validParams == nil {
-		return param, nil
-	}
-
-	var isValid bool
-
-	for _, valid := range validParams {
-		if param == valid {
-			isValid = true
-			break
-		}
-	}
-
-	if !isValid {
-		return "", fmt.Errorf("%v: %s", ErrorInvalidParam, param)
-	}
-
-	return param, nil
+	cli.rootCommand = rootCmd
 }

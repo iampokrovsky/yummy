@@ -1,8 +1,8 @@
 package main
 
 import (
-	"hw-5/config"
 	"log"
+	"yummy/config"
 )
 
 func main() {
