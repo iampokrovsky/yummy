@@ -9,9 +9,10 @@ help: ## Display this help screen
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 .PHONY: help
 
-run: ### Run application
-	go run ./cmd/app fmt test/testy.txt
-.PHONY: run
+# TODO Придумать более подходящие название
+run-cli: ### Run CLI application
+	go run ./cmd/app_cli
+.PHONY: run-cli
 
 compose-up: ### Run containers
 	docker compose up --build -d
@@ -26,7 +27,7 @@ compose-logs: ### View output from containers
 .PHONY: logs
 
 rm-volumes: ### Remove docker volumes
-	docker volume rm $(shell docker volume ls -q -f name=hw-5_)
+	docker volume rm $(shell docker volume ls -q -f name=yummy_)
 .PHONY: clean
 
 migrate-up: ### Migrate up
@@ -51,3 +52,5 @@ reload:
 	make migrate-up
 	make test-data
 .PHONY: reload
+
+# TODO Добавить команды для сборки бинарников разных типов

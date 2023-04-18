@@ -56,8 +56,8 @@ func (r *PostgresRepo) GetByID(ctx context.Context, id model.ID) (model.Restaura
 	return item, nil
 }
 
-// List returns a list of all restaurants
-func (r *PostgresRepo) List(ctx context.Context) ([]model.Restaurant, error) {
+// ListAll returns a list of all restaurants
+func (r *PostgresRepo) ListAll(ctx context.Context) ([]model.Restaurant, error) {
 	var items []model.Restaurant
 
 	query := `SELECT id, name, address, cuisine, created_at, updated_at, deleted_at FROM restaurants`
