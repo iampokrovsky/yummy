@@ -4,8 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"github.com/jackc/pgconn"
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v5"
 	"strconv"
 	"strings"
 	"time"
@@ -27,7 +28,7 @@ type PostgresRepo struct {
 	db DB
 }
 
-// NewPostgresRepo returns a pointer to a new instance of the PostgresRepo
+// NewPostgresRepo returns a pointer to a new instance of the PostgresRepo.
 func NewPostgresRepo(db DB) *PostgresRepo {
 	return &PostgresRepo{
 		db: db,
@@ -36,7 +37,7 @@ func NewPostgresRepo(db DB) *PostgresRepo {
 
 // TODO Добавить создание нескольких моделей одним запросом
 
-// Create creates a new menu item
+// Create creates a new menu item.
 func (r *PostgresRepo) Create(ctx context.Context, item model.MenuItem) (model.ID, error) {
 	var id model.ID
 
@@ -46,14 +47,38 @@ func (r *PostgresRepo) Create(ctx context.Context, item model.MenuItem) (model.I
 	return id, err
 }
 
-// CreateNew creates new menu items from
+// CreateNew creates new menu items.
 func (r *PostgresRepo) CreateNew(ctx context.Context, items []model.MenuItem) ([]uint64, error) {
-	// insert into menu_items(restaurant_id, name, price) values (1, 'item1', 100), (1, 'item2', 200) returning id;zz
+
+	stmt, err := r.db.Prepare(ctx, "my_query", "INSERT INTO my_table (name, age) VALUES ($1, $2), ($3, $4), ($5, $6) RETURNING id;")
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	var ids []int64
+	rows, err := db.Query(ctx, "my_query", "John", 25, "Alice", 30, "Bob", 35)
+	if err != nil {
+		// handle error
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var id int64
+		err := rows.Scan(&id)
+		if err != nil {
+			// handle error
+		}
+		ids = append(ids, id)
+	}
+	if err := rows.Err(); err != nil {
+		// handle error
+	}
+	fmt.Println(ids) // Output: [1, 2, 3]
 }
 
 // TODO Добавить получение нескольких моделей одним запросом. Объединить методы GetByID, ListByRestaurantID, ListByName
 
-// GetByID returns a menu item by ID
+// GetByID returns a menu item by ID.
 func (r *PostgresRepo) GetByID(ctx context.Context, id model.ID) (model.MenuItem, error) {
 	var item model.MenuItem
 
@@ -65,7 +90,7 @@ func (r *PostgresRepo) GetByID(ctx context.Context, id model.ID) (model.MenuItem
 	return item, nil
 }
 
-// ListByRestaurantID returns menu items by restaurant ID
+// ListByRestaurantID returns menu items by restaurant ID.
 func (r *PostgresRepo) ListByRestaurantID(ctx context.Context, restId model.ID) ([]model.MenuItem, error) {
 	var items []model.MenuItem
 
@@ -75,7 +100,7 @@ func (r *PostgresRepo) ListByRestaurantID(ctx context.Context, restId model.ID) 
 	return items, err
 }
 
-// ListByName returns menu items by name match
+// ListByName returns menu items by name match.
 func (r *PostgresRepo) ListByName(ctx context.Context, name string) ([]model.MenuItem, error) {
 	var items []model.MenuItem
 
@@ -87,7 +112,7 @@ func (r *PostgresRepo) ListByName(ctx context.Context, name string) ([]model.Men
 
 // TODO Добавить обновление нескольких моделей одним запросом
 
-// Update updates a menu item
+// Update updates a menu item.
 func (r *PostgresRepo) Update(ctx context.Context, item model.MenuItem) (bool, error) {
 	var query strings.Builder
 	query.WriteString(`UPDATE menu_items SET deleted_at = NULL, updated_at = $1`)
@@ -114,7 +139,7 @@ func (r *PostgresRepo) Update(ctx context.Context, item model.MenuItem) (bool, e
 
 // TODO Добавить удаление нескольких моделей одним запросом
 
-// Delete removes a menu item by ID
+// Delete removes a menu item by ID.
 func (r *PostgresRepo) Delete(ctx context.Context, id model.ID) (bool, error) {
 	query := `UPDATE menu_items SET deleted_at = $1 WHERE id = $2`
 	result, err := r.db.Exec(ctx, query, time.Now(), id)
@@ -124,7 +149,7 @@ func (r *PostgresRepo) Delete(ctx context.Context, id model.ID) (bool, error) {
 
 // TODO Добавить восстановление нескольких моделей одним запросом
 
-// Restore restores a menu item by ID
+// Restore restores a menu item by ID.
 func (r *PostgresRepo) Restore(ctx context.Context, id model.ID) (bool, error) {
 	query := `UPDATE menu_items SET deleted_at = NULL, updated_at = $1 WHERE id = $2`
 	result, err := r.db.Exec(ctx, query, time.Now(), id)

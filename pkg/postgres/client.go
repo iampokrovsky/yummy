@@ -14,12 +14,6 @@ const (
 	defaultConnTimeout  = time.Second
 )
 
-// DB is an interface for database operations.
-type DB interface {
-	DBops
-	Close()
-}
-
 // PostgresDB is a wrapper for pgxpool.Pool.
 type PostgresDB struct {
 	maxPoolSize  int

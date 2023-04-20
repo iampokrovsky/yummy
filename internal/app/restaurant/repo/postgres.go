@@ -4,8 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"github.com/jackc/pgconn"
-	"github.com/jackc/pgx/v4"
 	"strconv"
 	"strings"
 	"time"
@@ -16,12 +14,12 @@ var (
 	ErrObjectNotFound = errors.New("object not found")
 )
 
-type DB interface {
-	Select(ctx context.Context, dest interface{}, query string, args ...interface{}) error
-	Get(ctx context.Context, dest interface{}, query string, args ...interface{}) error
-	Exec(ctx context.Context, query string, args ...interface{}) (pgconn.CommandTag, error)
-	QueryRow(ctx context.Context, query string, args ...interface{}) pgx.Row
-}
+//type DB interface {
+//	Select(ctx context.Context, dest interface{}, query string, args ...interface{}) error
+//	Get(ctx context.Context, dest interface{}, query string, args ...interface{}) error
+//	Exec(ctx context.Context, query string, args ...interface{}) (pgconn.CommandTag, error)
+//	QueryRow(ctx context.Context, query string, args ...interface{}) pgx.Row
+//}
 
 type PostgresRepo struct {
 	db DB
