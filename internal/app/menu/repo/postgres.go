@@ -34,6 +34,8 @@ func NewPostgresRepo(db DB) *PostgresRepo {
 	}
 }
 
+// TODO Добавить создание нескольких моделей одним запросом
+
 // Create creates a new menu item
 func (r *PostgresRepo) Create(ctx context.Context, item model.MenuItem) (model.ID, error) {
 	var id model.ID
@@ -43,6 +45,13 @@ func (r *PostgresRepo) Create(ctx context.Context, item model.MenuItem) (model.I
 
 	return id, err
 }
+
+// CreateNew creates new menu items from
+func (r *PostgresRepo) CreateNew(ctx context.Context, items []model.MenuItem) ([]uint64, error) {
+	// insert into menu_items(restaurant_id, name, price) values (1, 'item1', 100), (1, 'item2', 200) returning id;zz
+}
+
+// TODO Добавить получение нескольких моделей одним запросом. Объединить методы GetByID, ListByRestaurantID, ListByName
 
 // GetByID returns a menu item by ID
 func (r *PostgresRepo) GetByID(ctx context.Context, id model.ID) (model.MenuItem, error) {
@@ -76,6 +85,8 @@ func (r *PostgresRepo) ListByName(ctx context.Context, name string) ([]model.Men
 	return items, err
 }
 
+// TODO Добавить обновление нескольких моделей одним запросом
+
 // Update updates a menu item
 func (r *PostgresRepo) Update(ctx context.Context, item model.MenuItem) (bool, error) {
 	var query strings.Builder
@@ -101,6 +112,8 @@ func (r *PostgresRepo) Update(ctx context.Context, item model.MenuItem) (bool, e
 	return result.RowsAffected() > 0, err
 }
 
+// TODO Добавить удаление нескольких моделей одним запросом
+
 // Delete removes a menu item by ID
 func (r *PostgresRepo) Delete(ctx context.Context, id model.ID) (bool, error) {
 	query := `UPDATE menu_items SET deleted_at = $1 WHERE id = $2`
@@ -108,6 +121,8 @@ func (r *PostgresRepo) Delete(ctx context.Context, id model.ID) (bool, error) {
 
 	return result.RowsAffected() > 0, err
 }
+
+// TODO Добавить восстановление нескольких моделей одним запросом
 
 // Restore restores a menu item by ID
 func (r *PostgresRepo) Restore(ctx context.Context, id model.ID) (bool, error) {
