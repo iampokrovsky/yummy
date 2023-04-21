@@ -1,9 +1,6 @@
 include .env
 
-export MAKEFLAGS="-s"
-
 DB_STRING := "host=postgres user=$(DB_USER) password=$(DB_PASS) dbname=$(DB_NAME) sslmode=$(DB_SSL)"
-
 
 help: ## Display this help screen
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
@@ -45,6 +42,15 @@ test-data: ### Fetch test data
 	docker cp -q ./test/test_data.sql postgres:/test/test_data.sql
 	docker exec postgres psql -q -U $(DB_USER) -d $(DB_NAME) -f /test/test_data.sql
 .PHONY: test-data
+
+mock: ### Run mockgen
+	mockgen -source ./pkg/postgres/interfaces.go -destination ./pkg/postgres/mock/mock.go
+.PHONY: mock
+
+bin-deps: ### Install binary dependencies
+	# TODO add goose
+	GOBIN=$(LOCAL_BIN) go install github.com/golang/mock/mockgen@v1.6.0
+.PHONY: bin-deps
 
 # TODO убрать
 reload:
