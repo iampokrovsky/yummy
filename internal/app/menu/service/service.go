@@ -36,7 +36,7 @@ func (s *Service) GetByID(ctx context.Context, id model.ID) (model.MenuItem, err
 	return s.repo.GetByID(ctx, id)
 }
 
-// ListByRestaurantID returns menu items by restaurant ID
+// ListByRestaurantID returns menu items by _restaurant ID
 func (s *Service) ListByRestaurantID(ctx context.Context, restId model.ID) ([]model.MenuItem, error) {
 	return s.repo.ListByRestaurantID(ctx, restId)
 }

@@ -58,6 +58,7 @@ func (s *Server) Notify() <-chan error {
 	return s.notify
 }
 
+// TODO: Check if it is correct to use context.Background() in this case.
 // Shutdown gracefully shuts down the server without interrupting any active connections.
 func (s *Server) Shutdown() error {
 	ctx, cancel := context.WithTimeout(context.Background(), s.shutdownTimeout)

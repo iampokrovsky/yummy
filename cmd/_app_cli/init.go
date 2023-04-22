@@ -3,13 +3,13 @@ package main
 import (
 	"context"
 	"log"
-	"yummy/cmd/app_cli/commands"
+	"yummy/cmd/_app_cli/commands"
 	"yummy/config"
+	restrepo "yummy/internal/app/_restaurant/repo"
+	restservice "yummy/internal/app/_restaurant/service"
 	core "yummy/internal/app/core"
 	menurepo "yummy/internal/app/menu/repo"
 	menuservice "yummy/internal/app/menu/service"
-	restrepo "yummy/internal/app/restaurant/repo"
-	restservice "yummy/internal/app/restaurant/service"
 	"yummy/pkg/postgres"
 )
 
@@ -23,7 +23,7 @@ func run(cfg config.Config) {
 		log.Fatal(err)
 	}
 
-	// Init restaurant service
+	// Init _restaurant service
 	restRepo := restrepo.NewPostgresRepo(db)
 	restService := restservice.NewService(restRepo)
 

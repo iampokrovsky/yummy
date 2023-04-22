@@ -19,7 +19,7 @@ type PostgresDB struct {
 	maxPoolSize  int
 	connAttempts int
 	connTimeout  time.Duration
-	Builder      *squirrel.StatementBuilderType
+	builder      *squirrel.StatementBuilderType
 	pool         *pgxpool.Pool
 }
 
@@ -36,7 +36,7 @@ func NewDB(ctx context.Context, dsn string, opts ...Option) (*PostgresDB, error)
 	}
 
 	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
-	pg.Builder = &psql
+	pg.builder = &psql
 
 	poolConfig, err := pgxpool.ParseConfig(dsn)
 	if err != nil {
@@ -62,6 +62,10 @@ func NewDB(ctx context.Context, dsn string, opts ...Option) (*PostgresDB, error)
 	}
 
 	return pg, nil
+}
+
+func (pg PostgresDB) Builder() *squirrel.StatementBuilderType {
+	return pg.builder
 }
 
 // Close closes the connection pool, releasing any open resources.

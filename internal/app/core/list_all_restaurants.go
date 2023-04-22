@@ -2,7 +2,7 @@ package core
 
 import (
 	"context"
-	restmodel "yummy/internal/app/restaurant/model"
+	restmodel "yummy/internal/app/_restaurant/model"
 )
 
 // ListAllRestaurants returns a list of all restaurants.

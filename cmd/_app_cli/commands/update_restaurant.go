@@ -2,19 +2,19 @@ package commands
 
 import (
 	"github.com/spf13/cobra"
-	restmodel "yummy/internal/app/restaurant/model"
+	restmodel "yummy/internal/app/_restaurant/model"
 )
 
 func (cli *CLI) updateRestaurantCmd() *cobra.Command {
 	var restRaw restmodel.Restaurant
 
 	cmd := &cobra.Command{
-		Use:   "restaurant",
-		Short: "Update restaurant by ID",
+		Use:   "_restaurant",
+		Short: "Update _restaurant by ID",
 		Run: func(cmd *cobra.Command, args []string) {
 			ok, err := cli.coreService.UpdateRestaurant(cmd.Context(), restRaw)
 			if !ok || err != nil {
-				cmd.PrintErrf("failed to update the restaurant: %v\n", err)
+				cmd.PrintErrf("failed to update the _restaurant: %v\n", err)
 			}
 
 			cmd.Println("Restaurant successfully updated.")

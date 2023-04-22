@@ -10,7 +10,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"yummy/cmd/app_cli/commands/utils"
+	"yummy/cmd/_app_cli/commands/utils"
 )
 
 func splitSentences(line string) []string {

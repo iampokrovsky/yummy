@@ -2,7 +2,7 @@ package core
 
 import (
 	"context"
-	restmodel "yummy/internal/app/restaurant/model"
+	restmodel "yummy/internal/app/_restaurant/model"
 )
 
 // ListRestaurantsByName returns a list of restaurants filtered by name.

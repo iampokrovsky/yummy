@@ -4,9 +4,9 @@ import (
 	"context"
 	"github.com/spf13/cobra"
 	"os"
-	utils2 "yummy/cmd/app_cli/commands/utils"
+	utils2 "yummy/cmd/_app_cli/commands/utils"
+	restmodel "yummy/internal/app/_restaurant/model"
 	menumodel "yummy/internal/app/menu/model"
-	restmodel "yummy/internal/app/restaurant/model"
 )
 
 type CoreService interface {

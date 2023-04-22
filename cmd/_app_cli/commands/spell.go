@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cobra"
 	"regexp"
 	"strings"
-	"yummy/cmd/app_cli/commands/utils"
+	"yummy/cmd/_app_cli/commands/utils"
 )
 
 var ErrNonEnglishWord = errors.New("the word contains non-English characters")

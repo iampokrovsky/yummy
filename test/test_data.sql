@@ -1,4 +1,4 @@
--- Get random restaurant name
+-- Get random _restaurant name
 CREATE OR REPLACE FUNCTION get_random_restaurant_name()
     RETURNS TEXT
     LANGUAGE plpgsql

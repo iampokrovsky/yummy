@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"github.com/Masterminds/squirrel"
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
 )
@@ -20,6 +21,8 @@ type DBops interface {
 // DB is an interface for database.
 type DB interface {
 	DBops
+	BeginTx(ctx context.Context, txOptions *pgx.TxOptions) (Tx, error)
+	Builder() *squirrel.StatementBuilderType
 	Close()
 }
 
@@ -29,10 +32,4 @@ type Tx interface {
 	Commit(ctx context.Context) error
 	Rollback(ctx context.Context) error
 	Close(ctx context.Context) error
-}
-
-// TxDB is an interface for database operations with transactions.
-type TxDB interface {
-	DB
-	BeginTx(ctx context.Context, txOptions *pgx.TxOptions) (Tx, error)
 }

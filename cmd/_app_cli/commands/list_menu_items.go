@@ -11,7 +11,7 @@ func (cli *CLI) listMenuItemsCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "menu-items",
-		Short: "ListAll menu items by restaurant ID",
+		Short: "ListAll menu items by _restaurant ID",
 		Run: func(cmd *cobra.Command, args []string) {
 			items, err := cli.coreService.ListMenuItemsByRestaurantID(cmd.Context(), menumodel.ID(restId))
 			if err != nil {

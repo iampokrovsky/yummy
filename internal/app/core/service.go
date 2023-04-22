@@ -2,8 +2,8 @@ package core
 
 import (
 	"context"
+	restmodel "yummy/internal/app/_restaurant/model"
 	menumodel "yummy/internal/app/menu/model"
-	restmodel "yummy/internal/app/restaurant/model"
 )
 
 type RestaurantService interface {

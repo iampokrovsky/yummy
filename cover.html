@@ -1,0 +1,365 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>repo: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">yummy/internal/app/menu/repo/dto.go (0.0%)</option>
+				
+				<option value="file1">yummy/internal/app/menu/repo/repo.go (48.5%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package repo
+
+import (
+        "database/sql"
+        "time"
+        "yummy/internal/app/menu/model"
+)
+
+type IDRow uint64
+type MoneyRow int64
+
+type MenuItemRow struct {
+        ID           IDRow        `db:"id"`
+        RestaurantID IDRow        `db:"restaurant_id"`
+        Name         string       `db:"name"`
+        Price        MoneyRow     `db:"price"`
+        CreatedAt    time.Time    `db:"created_at"`
+        UpdatedAt    sql.NullTime `db:"updated_at"`
+        DeletedAt    sql.NullTime `db:"deleted_at"`
+}
+
+func (row *MenuItemRow) mapFromModel(m model.MenuItem) <span class="cov0" title="0">{
+        row.ID = IDRow(m.ID)
+        row.RestaurantID = IDRow(m.RestaurantID)
+        row.Name = m.Name
+        row.Price = MoneyRow(m.Price)
+        row.CreatedAt = m.CreatedAt
+        row.UpdatedAt = m.UpdatedAt
+        row.DeletedAt = m.DeletedAt
+}</span>
+
+func (row *MenuItemRow) mapToModel() model.MenuItem <span class="cov0" title="0">{
+        return model.MenuItem{
+                ID:           model.ID(row.ID),
+                RestaurantID: model.ID(row.RestaurantID),
+                Name:         row.Name,
+                Price:        model.Money(row.Price),
+                CreatedAt:    row.CreatedAt,
+                UpdatedAt:    row.UpdatedAt,
+                DeletedAt:    row.DeletedAt,
+        }
+}</span>
+
+func mapFromModels(items []model.MenuItem) []MenuItemRow <span class="cov0" title="0">{
+        rows := make([]MenuItemRow, len(items))
+        for i, item := range items </span><span class="cov0" title="0">{
+                rows[i].mapFromModel(item)
+        }</span>
+        <span class="cov0" title="0">return rows</span>
+}
+
+func mapToModels(rows []MenuItemRow) []model.MenuItem <span class="cov0" title="0">{
+        items := make([]model.MenuItem, len(rows))
+        for i, row := range rows </span><span class="cov0" title="0">{
+                items[i] = row.mapToModel()
+        }</span>
+        <span class="cov0" title="0">return items</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package repo
+
+import (
+        "context"
+        "database/sql"
+        "errors"
+        "fmt"
+        "github.com/Masterminds/squirrel"
+        "github.com/jackc/pgconn"
+        "github.com/jackc/pgx/v4"
+        "time"
+)
+
+var (
+        ErrObjectNotFound = errors.New("object not found")
+        ErrBuildQuery     = errors.New("failed to build query")
+)
+
+// DBops is an interface for database operations.
+type DB interface {
+        Get(ctx context.Context, dest any, query string, args ...any) error
+        Select(ctx context.Context, dest any, query string, args ...any) error
+        Exec(ctx context.Context, query string, args ...any) (pgconn.CommandTag, error)
+        Query(ctx context.Context, query string, args ...any) (pgx.Rows, error)
+        QueryRow(ctx context.Context, query string, args ...any) pgx.Row
+        SendBatch(ctx context.Context, batch *pgx.Batch) pgx.BatchResults
+        CopyFrom(ctx context.Context, tableName pgx.Identifier, columnNames []string, rowSrc pgx.CopyFromSource) (int64, error)
+        Builder() *squirrel.StatementBuilderType
+        Close()
+}
+
+// MenuRepo is a repository for menu items.
+type MenuRepo struct {
+        db DB
+}
+
+// NewMenuRepo creates a new instance of a menu repository.
+func NewMenuRepo(db DB) *MenuRepo <span class="cov8" title="1">{
+        return &amp;MenuRepo{
+                db: db,
+        }
+}</span>
+
+// Create creates new menu items.
+func (r *MenuRepo) Create(ctx context.Context, items []MenuItemRow) ([]uint64, error) <span class="cov8" title="1">{
+        // Build a query
+        qb := r.db.Builder().
+                Insert("menu_items").
+                Columns("restaurant_id", "name", "price")
+        for _, item := range items </span><span class="cov8" title="1">{
+                qb = qb.Values(item.RestaurantID, item.Name, item.Price)
+        }</span>
+        <span class="cov8" title="1">qb.Suffix(`RETURNING id`)
+        query, args, err := qb.ToSql()
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, ErrBuildQuery
+        }</span>
+
+        // Execute the query and read the result
+        <span class="cov8" title="1">ids := make([]uint64, 0, len(items))
+        rows, err := r.db.Query(ctx, query, args...)
+        if err == sql.ErrNoRows </span><span class="cov8" title="1">{
+                return nil, ErrObjectNotFound
+        }</span>
+        <span class="cov8" title="1">for rows.Next() </span><span class="cov0" title="0">{
+                var id uint64
+                if err = rows.Scan(&amp;id); err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+                <span class="cov0" title="0">ids = append(ids, id)</span>
+        }
+        <span class="cov8" title="1">if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">return ids, nil</span>
+}
+
+// GetByID returns a menu item by ID.
+func (r *MenuRepo) GetByID(ctx context.Context, id uint64) (MenuItemRow, error) <span class="cov8" title="1">{
+        var item MenuItemRow
+
+        query, args, err := r.db.Builder().Select("id", "restaurant_id", "name", "price", "created_at", "updated_at", "deleted_at").
+                From("menu_items").
+                Where(squirrel.Eq{"id": id}).ToSql()
+        if err != nil </span><span class="cov0" title="0">{
+                return item, ErrBuildQuery
+        }</span>
+
+        <span class="cov8" title="1">fmt.Println(query, args)
+
+        if err = r.db.Get(ctx, &amp;item, query, args...); err == sql.ErrNoRows </span><span class="cov8" title="1">{
+                return item, ErrObjectNotFound
+        }</span>
+        <span class="cov8" title="1">if err != nil </span><span class="cov8" title="1">{
+                return item, err
+        }</span>
+
+        <span class="cov8" title="1">return item, nil</span>
+}
+
+// ListByRestaurantID returns menu items by _restaurant ID.
+func (r *MenuRepo) ListByRestaurantID(ctx context.Context, restId uint64) ([]MenuItemRow, error) <span class="cov8" title="1">{
+        var items []MenuItemRow
+
+        query, args, err := r.db.Builder().
+                Select("id", "restaurant_id", "name", "price", "created_at", "updated_at", "deleted_at").
+                From("menu_items").
+                Where(squirrel.Eq{"restaurant_id": restId}).ToSql()
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">if err = r.db.Select(ctx, &amp;items, query, args...); err == sql.ErrNoRows </span><span class="cov8" title="1">{
+                return nil, ErrObjectNotFound
+        }</span>
+        <span class="cov8" title="1">if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">return items, nil</span>
+}
+
+// ListByName returns menu items by name match.
+func (r *MenuRepo) ListByName(ctx context.Context, name string) ([]MenuItemRow, error) <span class="cov0" title="0">{
+        var items []MenuItemRow
+
+        query, args, err := r.db.Builder().Select("id", "restaurant_id", "name", "price", "created_at", "updated_at", "deleted_at").
+                From("menu_items").
+                Where(squirrel.ILike{"name": "%" + name + "%"}).
+                ToSql()
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">if err := r.db.Select(ctx, &amp;items, query, args...); err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">return items, err</span>
+}
+
+// Update updates menu items.
+func (r *MenuRepo) Update(ctx context.Context, items []MenuItemRow) (bool, error) <span class="cov0" title="0">{
+        qb := squirrel.Update("menu_items").
+                Set("deleted_at", nil).
+                Set("updated_at", time.Now())
+
+        for _, item := range items </span><span class="cov0" title="0">{
+                if item.Name != "" </span><span class="cov0" title="0">{
+                        qb = qb.Set("name", item.Name)
+                }</span>
+
+                <span class="cov0" title="0">if item.Price != 0 </span><span class="cov0" title="0">{
+                        qb = qb.Set("price", item.Price)
+                }</span>
+
+                <span class="cov0" title="0">qb = qb.Where(squirrel.Eq{"id": item.ID})</span>
+        }
+
+        <span class="cov0" title="0">query, args, err := qb.ToSql()
+        if err != nil </span><span class="cov0" title="0">{
+                return false, err
+        }</span>
+
+        <span class="cov0" title="0">result, err := r.db.Exec(ctx, query, args...)
+
+        return result.RowsAffected() &gt; 0, err</span>
+}
+
+// Delete removes a menu item by ID.
+func (r *MenuRepo) Delete(ctx context.Context, ids []uint64) (bool, error) <span class="cov0" title="0">{
+        query, args, err := r.db.Builder().Update("menu_items").
+                Set("deleted_at", time.Now()).
+                Where(squirrel.Eq{"id": ids}).
+                ToSql()
+        if err != nil </span><span class="cov0" title="0">{
+                return false, err
+        }</span>
+
+        <span class="cov0" title="0">result, err := r.db.Exec(ctx, query, args...)
+
+        return result.RowsAffected() &gt; 0, err</span>
+}
+
+// Restore restores a menu item by ID.
+func (r *MenuRepo) Restore(ctx context.Context, ids []uint64) (bool, error) <span class="cov0" title="0">{
+        query, args, err := r.db.Builder().Update("menu_items").
+                Set("deleted_at", nil).
+                Set("updated_at", time.Now()).
+                Where(squirrel.Eq{"id": ids}).
+                ToSql()
+        if err != nil </span><span class="cov0" title="0">{
+                return false, err
+        }</span>
+
+        <span class="cov0" title="0">result, err := r.db.Exec(ctx, query, args...)
+
+        return result.RowsAffected() &gt; 0, err</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
