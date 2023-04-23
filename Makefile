@@ -37,11 +37,11 @@ migrate-down: ### Migrate down
 
 test-data: ### Fetch test data
 	docker exec -d postgres mkdir -p /test
-	docker cp -q ./test/test_data.sql postgres:/test/test_data.sql
+	docker cp -q ./test/static/test_data.sql postgres:/test/test_data.sql
 	docker exec postgres psql -q -U $(DB_USER) -d $(DB_NAME) -f /test/test_data.sql
 .PHONY: test-data
 
-# TODO Придумать более подходящие название
+# TODO: come up with a better name
 run-cli: ### Run CLI application
 	go run ./cmd/app_cli
 .PHONY: run-cli
@@ -50,16 +50,27 @@ mock: ### Run mockgen
 	mockgen -source ./pkg/postgres/interfaces.go -destination ./pkg/postgres/mock/mock.go
 .PHONY: mock
 
-test-cover: ### Run mockgen
+test-unit: ### Run unit tests
+	# TODO
+.PHONY: test-unit
+
+test-integration: ### Run integration tests
+	# TODO
+	go clean -testcache
+	go test -tags=integration ./integration_tests/...
+.PHONY: test-integration
+
+test-cover: ### Run tests with coverage
 	go test -v ./... -coverprofile=cover.out
 	go tool cover -html=cover.out -o cover.html
 .PHONY: test-cover
 
-# TODO убрать
+
+# TODO: remove
 reload:
 	make migrate-down
 	make migrate-up
 	make test-data
 .PHONY: reload
 
-# TODO Добавить команды для сборки бинарников разных типов
+# TODO: add command for building different types of binaries
