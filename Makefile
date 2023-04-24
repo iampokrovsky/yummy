@@ -37,31 +37,32 @@ migrate-down: ### Migrate down
 
 test-data: ### Fetch test data
 	docker exec -d postgres mkdir -p /test
-	docker cp -q ./test/static/test_data.sql postgres:/test/test_data.sql
+	docker cp -q ./test/sql/test_data.sql postgres:/test/test_data.sql
 	docker exec postgres psql -q -U $(DB_USER) -d $(DB_NAME) -f /test/test_data.sql
 .PHONY: test-data
 
-# TODO: come up with a better name
-run-cli: ### Run CLI application
+run: ### Run app
 	go run ./cmd/app_cli
+	# TODO
 .PHONY: run-cli
 
-mock: ### Run mockgen
-	mockgen -source ./pkg/postgres/interfaces.go -destination ./pkg/postgres/mock/mock.go
-.PHONY: mock
+mocks: ### Run mockgen
+	mockgen -source ./internal/app/menu/repo/interfaces.go -destination ./test/mocks/menu_repo.go -package mocks
+.PHONY: mocks
 
 test-unit: ### Run unit tests
-	# TODO
+	go clean -testcache
+	go test -v ./...
 .PHONY: test-unit
 
 test-integration: ### Run integration tests
-	# TODO
 	go clean -testcache
-	go test -tags=integration ./integration_tests/...
+	go test -tags=integration -v ./...
 .PHONY: test-integration
 
 test-cover: ### Run tests with coverage
-	go test -v ./... -coverprofile=cover.out
+	go clean -testcache
+	go test -tags=all,integration -v -coverpkg=./... ./... -coverprofile=cover.out
 	go tool cover -html=cover.out -o cover.html
 .PHONY: test-cover
 

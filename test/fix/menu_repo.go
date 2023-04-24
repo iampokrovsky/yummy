@@ -3,26 +3,26 @@ package fix
 import (
 	"database/sql"
 	"time"
-	menurepo "yummy/internal/app/menu/repo"
+	menu_model "yummy/internal/app/menu/model"
 )
 
 type MenuItemRowBuilder struct {
-	instance *menurepo.MenuItemRow
+	instance *menu_model.MenuItem
 }
 
 func MenuItemRow() *MenuItemRowBuilder {
 	return &MenuItemRowBuilder{
-		instance: &menurepo.MenuItemRow{},
+		instance: &menu_model.MenuItem{},
 	}
 }
 
 func (b *MenuItemRowBuilder) ID(id uint64) *MenuItemRowBuilder {
-	b.instance.ID = menurepo.IDRow(id)
+	b.instance.ID = menu_model.ID(id)
 	return b
 }
 
 func (b *MenuItemRowBuilder) RestaurantID(id uint64) *MenuItemRowBuilder {
-	b.instance.RestaurantID = menurepo.IDRow(id)
+	b.instance.RestaurantID = menu_model.ID(id)
 	return b
 }
 
@@ -32,7 +32,7 @@ func (b *MenuItemRowBuilder) Name(name string) *MenuItemRowBuilder {
 }
 
 func (b *MenuItemRowBuilder) Price(price uint64) *MenuItemRowBuilder {
-	b.instance.Price = menurepo.MoneyRow(price)
+	b.instance.Price = menu_model.Money(price)
 	return b
 }
 
@@ -51,17 +51,17 @@ func (b *MenuItemRowBuilder) DeletedAt(deletedAt time.Time) *MenuItemRowBuilder 
 	return b
 }
 
-func (b *MenuItemRowBuilder) build() *menurepo.MenuItemRow {
+func (b *MenuItemRowBuilder) build() *menu_model.MenuItem {
 	if b.instance.CreatedAt.IsZero() {
 		b.instance.CreatedAt = time.Now()
 	}
 	return b.instance
 }
 
-func (b *MenuItemRowBuilder) BuildP() *menurepo.MenuItemRow {
+func (b *MenuItemRowBuilder) BuildP() *menu_model.MenuItem {
 	return b.build()
 }
 
-func (b *MenuItemRowBuilder) BuildV() menurepo.MenuItemRow {
+func (b *MenuItemRowBuilder) BuildV() menu_model.MenuItem {
 	return *(b.build())
 }

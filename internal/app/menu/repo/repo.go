@@ -8,12 +8,13 @@ import (
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
 	"time"
+	"yummy/internal/app/menu/model"
 	"yummy/pkg/postgres"
 )
 
 var (
-	ErrObjectNotFound = errors.New("object not found")
-	ErrBuildQuery     = errors.New("failed to build query")
+	ErrNotFound   = errors.New("object not found")
+	ErrBuildQuery = errors.New("failed to build query")
 )
 
 // DB is an interface for a database.
@@ -26,20 +27,20 @@ type DB interface {
 	Builder() *squirrel.StatementBuilderType
 }
 
-// MenuRepo is a repository for menu items.
-type MenuRepo struct {
+// MenuRepository is a repository for menu items.
+type MenuRepository struct {
 	db DB
 }
 
 // NewMenuRepo creates a new instance of a menu repository.
-func NewMenuRepo(db DB) *MenuRepo {
-	return &MenuRepo{
+func NewMenuRepo(db DB) *MenuRepository {
+	return &MenuRepository{
 		db: db,
 	}
 }
 
 // Create creates new menu items.
-func (r *MenuRepo) Create(ctx context.Context, items ...MenuItemRow) ([]uint64, error) {
+func (r *MenuRepository) Create(ctx context.Context, items ...model.MenuItem) ([]uint64, error) {
 	// Build a query
 	qb := r.db.Builder().
 		Insert("menu_items").
@@ -57,9 +58,6 @@ func (r *MenuRepo) Create(ctx context.Context, items ...MenuItemRow) ([]uint64, 
 	ids := make([]uint64, 0, len(items))
 	rows, err := r.db.Query(ctx, query, args...)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, ErrObjectNotFound
-		}
 		return nil, err
 	}
 	for rows.Next() {
@@ -77,18 +75,21 @@ func (r *MenuRepo) Create(ctx context.Context, items ...MenuItemRow) ([]uint64, 
 }
 
 // GetByID returns a menu item by ID.
-func (r *MenuRepo) GetByID(ctx context.Context, id uint64) (MenuItemRow, error) {
+func (r *MenuRepository) GetByID(ctx context.Context, id uint64) (model.MenuItem, error) {
 	items, err := r.ListByID(ctx, id)
 	if err != nil {
-		return MenuItemRow{}, err
+		return model.MenuItem{}, err
+	}
+	if len(items) == 0 {
+		return model.MenuItem{}, ErrNotFound
 	}
 
 	return items[0], nil
 }
 
 // ListByID returns menu items by IDs.
-func (r *MenuRepo) ListByID(ctx context.Context, ids ...uint64) ([]MenuItemRow, error) {
-	var items []MenuItemRow
+func (r *MenuRepository) ListByID(ctx context.Context, ids ...uint64) ([]model.MenuItem, error) {
+	var items []model.MenuItem
 
 	query, args, err := r.db.Builder().
 		Select("id", "restaurant_id", "name", "price", "created_at", "updated_at", "deleted_at").
@@ -100,7 +101,7 @@ func (r *MenuRepo) ListByID(ctx context.Context, ids ...uint64) ([]MenuItemRow, 
 
 	if err = r.db.Select(ctx, &items, query, args...); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, ErrObjectNotFound
+			return nil, ErrNotFound
 		}
 		return nil, err
 	}
@@ -109,8 +110,8 @@ func (r *MenuRepo) ListByID(ctx context.Context, ids ...uint64) ([]MenuItemRow, 
 }
 
 // ListByRestaurantID returns menu items by restaurant ID.
-func (r *MenuRepo) ListByRestaurantID(ctx context.Context, restId uint64) ([]MenuItemRow, error) {
-	var items []MenuItemRow
+func (r *MenuRepository) ListByRestaurantID(ctx context.Context, restId uint64) ([]model.MenuItem, error) {
+	var items []model.MenuItem
 
 	query, args, err := r.db.Builder().
 		Select("id", "restaurant_id", "name", "price", "created_at", "updated_at", "deleted_at").
@@ -122,17 +123,21 @@ func (r *MenuRepo) ListByRestaurantID(ctx context.Context, restId uint64) ([]Men
 
 	if err = r.db.Select(ctx, &items, query, args...); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, ErrObjectNotFound
+			return nil, ErrNotFound
 		}
 		return nil, err
+	}
+
+	if len(items) == 0 {
+		return nil, ErrNotFound
 	}
 
 	return items, nil
 }
 
 // ListByName returns menu items by name match.
-func (r *MenuRepo) ListByName(ctx context.Context, name string) ([]MenuItemRow, error) {
-	var items []MenuItemRow
+func (r *MenuRepository) ListByName(ctx context.Context, name string) ([]model.MenuItem, error) {
+	var items []model.MenuItem
 
 	query, args, err := r.db.Builder().
 		Select("id", "restaurant_id", "name", "price", "created_at", "updated_at", "deleted_at").
@@ -144,16 +149,20 @@ func (r *MenuRepo) ListByName(ctx context.Context, name string) ([]MenuItemRow, 
 
 	if err = r.db.Select(ctx, &items, query, args...); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, ErrObjectNotFound
+			return nil, ErrNotFound
 		}
 		return nil, err
+	}
+
+	if len(items) == 0 {
+		return nil, ErrNotFound
 	}
 
 	return items, err
 }
 
 // Update updates menu items.
-func (r *MenuRepo) Update(ctx context.Context, items ...MenuItemRow) (bool, error) {
+func (r *MenuRepository) Update(ctx context.Context, items ...model.MenuItem) (bool, error) {
 	var rowsAft int64
 
 	// Start transaction
@@ -196,7 +205,7 @@ func (r *MenuRepo) Update(ctx context.Context, items ...MenuItemRow) (bool, erro
 }
 
 // Delete removes menu items by ID.
-func (r *MenuRepo) Delete(ctx context.Context, ids ...uint64) (bool, error) {
+func (r *MenuRepository) Delete(ctx context.Context, ids ...uint64) (bool, error) {
 	query, args, err := r.db.Builder().
 		Update("menu_items").
 		Set("deleted_at", time.Now()).
@@ -211,7 +220,7 @@ func (r *MenuRepo) Delete(ctx context.Context, ids ...uint64) (bool, error) {
 }
 
 // Restore restores a menu item by ID.
-func (r *MenuRepo) Restore(ctx context.Context, ids ...uint64) (bool, error) {
+func (r *MenuRepository) Restore(ctx context.Context, ids ...uint64) (bool, error) {
 	query, args, err := r.db.Builder().Update("menu_items").
 		Set("deleted_at", nil).
 		Set("updated_at", time.Now()).
