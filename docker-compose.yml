@@ -20,17 +20,6 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
 
-  goose:
-    image: goose
-    build: ./migrations
-    container_name: goose
-    env_file: .env
-    volumes:
-      - ./migrations:/migrations # TODO Убрать
-    depends_on:
-      postgres:
-        condition: service_healthy
-
   pgweb:
     image: sosedoff/pgweb
     container_name: pgweb

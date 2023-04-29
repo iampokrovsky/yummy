@@ -3,34 +3,36 @@ package main
 import (
 	"context"
 	"log"
-	"yummy/cli"
+	"os"
+	"os/signal"
+	"syscall"
 	"yummy/config"
-	menurepo "yummy/internal/app/menu/repo"
-	menuservice "yummy/internal/app/menu/service"
-	restrepo "yummy/internal/app/restaurant/repo"
-	restservice "yummy/internal/app/restaurant/service"
-	"yummy/pkg/postgres"
+	menu_repo "yummy/internal/app/menu/repo"
+	"yummy/internal/pkg/api"
+	"yummy/pkg/httpserver"
+	"yummy/test/postgres"
 )
 
-func run(cfg config.Config) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+func Run(cfg config.Config) {
+	// Init layers
+	db := postgres.NewPostgresTestDB(context.Background(), cfg.DB.GetDSN())
+	menuRepo := menu_repo.NewMenuRepo(db)
+	router := api.NewRouter(menuRepo)
+	server := httpserver.New(router, httpserver.Port("8080"))
 
-	// Init DB
-	db, err := postgres.NewDB(ctx, cfg.DB.GetDSN())
-	if err != nil {
-		log.Fatal(err)
+	// Waiting signal
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
+
+	select {
+	case s := <-interrupt:
+		log.Printf("Got signal: %v, exiting.", s)
+	case err := <-server.Notify():
+		log.Printf("Got server err signal: %v, exiting.", err)
 	}
 
-	// Init restaurant service
-	restRepo := restrepo.NewPostgresRepo(db)
-	restService := restservice.NewService(restRepo)
-
-	// Init menu service
-	menuRepo := menurepo.NewPostgresRepo(db)
-	menuService := menuservice.NewService(menuRepo)
-
-	// Init CLI
-	cmd := cli.New(restService, menuService)
-	cmd.Execute(ctx)
+	// Shutdown
+	if err := server.Shutdown(); err != nil {
+		log.Fatalf("Server shutdown error: %s", err)
+	}
 }

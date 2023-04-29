@@ -27,36 +27,36 @@ func NewService(repo Repo) *Service {
 }
 
 // Create creates a menu item
-func (r *Service) Create(ctx context.Context, item model.MenuItem) (model.ID, error) {
-	return r.repo.Create(ctx, item)
+func (s *Service) Create(ctx context.Context, item model.MenuItem) (model.ID, error) {
+	return s.repo.Create(ctx, item)
 }
 
 // GetByID returns a menu item by ID
-func (r *Service) GetByID(ctx context.Context, id model.ID) (model.MenuItem, error) {
-	return r.repo.GetByID(ctx, id)
+func (s *Service) GetByID(ctx context.Context, id model.ID) (model.MenuItem, error) {
+	return s.repo.GetByID(ctx, id)
 }
 
-// ListByRestaurantID returns menu items by restaurant ID
-func (r *Service) ListByRestaurantID(ctx context.Context, restId model.ID) ([]model.MenuItem, error) {
-	return r.repo.ListByRestaurantID(ctx, restId)
+// ListByRestaurantID returns menu items by _restaurant ID
+func (s *Service) ListByRestaurantID(ctx context.Context, restId model.ID) ([]model.MenuItem, error) {
+	return s.repo.ListByRestaurantID(ctx, restId)
 }
 
 // ListByName returns menu items by name match
-func (r *Service) ListByName(ctx context.Context, name string) ([]model.MenuItem, error) {
-	return r.repo.ListByName(ctx, name)
+func (s *Service) ListByName(ctx context.Context, name string) ([]model.MenuItem, error) {
+	return s.repo.ListByName(ctx, name)
 }
 
 // Update updates a menu item
-func (r *Service) Update(ctx context.Context, item model.MenuItem) (bool, error) {
-	return r.repo.Update(ctx, item)
+func (s *Service) Update(ctx context.Context, item model.MenuItem) (bool, error) {
+	return s.repo.Update(ctx, item)
 }
 
 // Delete removes a menu item by ID
-func (r *Service) Delete(ctx context.Context, id model.ID) (bool, error) {
-	return r.repo.Delete(ctx, id)
+func (s *Service) Delete(ctx context.Context, id model.ID) (bool, error) {
+	return s.repo.Delete(ctx, id)
 }
 
 // Restore restores a menu item by ID
-func (r *Service) Restore(ctx context.Context, id model.ID) (bool, error) {
-	return r.repo.Restore(ctx, id)
+func (s *Service) Restore(ctx context.Context, id model.ID) (bool, error) {
+	return s.repo.Restore(ctx, id)
 }

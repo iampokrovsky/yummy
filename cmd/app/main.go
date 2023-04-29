@@ -13,5 +13,5 @@ func main() {
 	}
 
 	// Run
-	run(cfg)
+	Run(cfg)
 }

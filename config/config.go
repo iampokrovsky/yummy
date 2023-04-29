@@ -23,15 +23,15 @@ func (db *DB) GetDSN() string {
 	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", db.Host, db.Port, db.User, db.Password, db.DBName, db.SSLMode)
 }
 
-func New() (Config, error) {
+func New(filenames ...string) (Config, error) {
 	var cfg Config
 
-	if err := godotenv.Load(); err != nil {
-		return cfg, fmt.Errorf("config error: %w", err)
+	if err := godotenv.Load(filenames...); err != nil {
+		return cfg, err
 	}
 
 	if err := cleanenv.ReadEnv(&cfg); err != nil {
-		return cfg, fmt.Errorf("config error: %w", err)
+		return cfg, err
 	}
 
 	return cfg, nil
