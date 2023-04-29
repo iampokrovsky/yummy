@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"yummy/internal/app/_restaurant/model"
+	"yummy/internal/app/restaurant/model"
 )
 
 var (
@@ -34,7 +34,7 @@ func NewPostgresRepo(db DB) *PostgresRepo {
 	}
 }
 
-// Create creates a _restaurant
+// Create creates a restaurant
 func (r *PostgresRepo) Create(ctx context.Context, item model.Restaurant) (model.ID, error) {
 	var id model.ID
 
@@ -44,7 +44,7 @@ func (r *PostgresRepo) Create(ctx context.Context, item model.Restaurant) (model
 	return id, err
 }
 
-// GetByID returns a _restaurant by ID
+// GetByID returns a restaurant by ID
 func (r *PostgresRepo) GetByID(ctx context.Context, id model.ID) (model.Restaurant, error) {
 	var item model.Restaurant
 
@@ -86,7 +86,7 @@ func (r *PostgresRepo) ListByCuisine(ctx context.Context, cuisine string) ([]mod
 	return items, err
 }
 
-// Update updates a _restaurant
+// Update updates a restaurant
 func (r *PostgresRepo) Update(ctx context.Context, item model.Restaurant) (bool, error) {
 	var query strings.Builder
 	query.WriteString(`UPDATE restaurants SET deleted_at = NULL, updated_at = $1`)
@@ -116,7 +116,7 @@ func (r *PostgresRepo) Update(ctx context.Context, item model.Restaurant) (bool,
 	return result.RowsAffected() > 0, err
 }
 
-// Delete removes a _restaurant by ID
+// Delete removes a restaurant by ID
 func (r *PostgresRepo) Delete(ctx context.Context, id model.ID) (bool, error) {
 	query := `UPDATE restaurants SET deleted_at = $1 WHERE id = $2`
 	result, err := r.db.Exec(ctx, query, time.Now(), id)
@@ -124,7 +124,7 @@ func (r *PostgresRepo) Delete(ctx context.Context, id model.ID) (bool, error) {
 	return result.RowsAffected() > 0, err
 }
 
-// Restore restores a _restaurant item by ID
+// Restore restores a restaurant item by ID
 func (r *PostgresRepo) Restore(ctx context.Context, id model.ID) (bool, error) {
 	query := `UPDATE restaurants SET deleted_at = NULL, updated_at = $1 WHERE id = $2`
 	result, err := r.db.Exec(ctx, query, time.Now(), id)

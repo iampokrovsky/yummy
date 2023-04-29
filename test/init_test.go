@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http/httptest"
 	menu_repo "yummy/internal/app/menu/repo"
-	"yummy/internal/pkg/api"
+	"yummy/internal/pkg/rest"
 	"yummy/test/postgres"
 )
 
@@ -18,6 +18,6 @@ var (
 func init() {
 	db = postgres.NewPostgresTestDB(context.Background(), dsn)
 	menuRepo = menu_repo.NewMenuRepo(db)
-	router := api.NewRouter(menuRepo)
+	router := rest.NewRouter(menuRepo)
 	server = httptest.NewServer(router)
 }

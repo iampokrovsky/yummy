@@ -1,4 +1,4 @@
--- Create a _restaurant
+-- Create a restaurant
 INSERT INTO restaurants (name, address, cuisine)
 VALUES ('Chiho', '5568 Pine Rd, Houston, NM', 'Italian'::cuisine)
 RETURNING id;
@@ -7,22 +7,22 @@ RETURNING id;
 SELECT id, name, address, cuisine, created_at, updated_at, deleted_at
 FROM restaurants;
 
--- Get _restaurant by id
+-- Get restaurant by id
 SELECT id, name, address, cuisine, created_at, updated_at, deleted_at
 FROM restaurants
 WHERE id = 1;
 
--- Get _restaurant by name
+-- Get restaurant by name
 SELECT id, name, address, cuisine, created_at, updated_at, deleted_at
 FROM restaurants
 WHERE name ILIKE '%Chiho%';
 
--- Get _restaurant by cuisine
+-- Get restaurant by cuisine
 SELECT id, name, address, cuisine, created_at, updated_at, deleted_at
 FROM restaurants
 WHERE cuisine = 'Italian';
 
--- Update _restaurant by id
+-- Update restaurant by id
 UPDATE restaurants
 SET name       = 'Unicorn',
     address    = '135 Elm St, San Diego, OH',
@@ -30,12 +30,12 @@ SET name       = 'Unicorn',
     updated_at = now()
 WHERE id = 1;
 
--- Delete _restaurant by id
+-- Delete restaurant by id
 UPDATE restaurants
 SET deleted_at = now()
 WHERE id = 1;
 
--- Restore _restaurant by id
+-- Restore restaurant by id
 UPDATE users
 SET deleted_at = NULL,
     updated_at = now()

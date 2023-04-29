@@ -1,14 +1,24 @@
 include .env
 
 DB_STRING := "host=$(DB_HOST) user=$(DB_USER) password=$(DB_PASS) dbname=$(DB_NAME) sslmode=$(DB_SSL)"
+PB_PATH := "internal/pkg/api"
 
 help: ## Display this help screen
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 .PHONY: help
 
-bin-deps: ### Install binary dependencies
-	GOBIN=$(LOCAL_BIN) go install github.com/pressly/goose/v3/cmd/goose@v3.10.0
-	GOBIN=$(LOCAL_BIN) go install github.com/golang/mock/mockgen@v1.6.0
+get-protoc:	### Install protoc and Go plugins
+	curl -LO "https://github.com/protocolbuffers/protobuf/releases/download/v3.15.8/protoc-3.15.8-linux-x86_64.zip"
+	unzip protoc-3.15.8-linux-x86_64.zip -d "${HOME}/.local"
+	export PATH="${PATH}:${HOME}/.local/bin"
+	rm protoc-3.15.8-linux-x86_64.zip
+	go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
+	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
+
+bin-deps: get-protoc ### Install binary dependencies
+	go install github.com/pressly/goose/v3/cmd/goose@v3.10.0
+	go install github.com/golang/mock/mockgen@v1.6.0
+	export PATH="${PATH}:$(go env GOPATH)/bin"
 .PHONY: bin-deps
 
 compose-up: ### Run containers
@@ -66,6 +76,16 @@ test-cover: ### Run tests with coverage
 	go tool cover -html=cover.out -o cover.html
 .PHONY: test-cover
 
+
+generate: ### Generate gRPC code
+	if [ -d $(PB_PATH) ]; then rm -rf $(PB_PATH); fi
+	mkdir -p $(PB_PATH)
+	protoc \
+  --proto_path=api/proto/ \
+  --go_out=$(PB_PATH) \
+  --go-grpc_out=$(PB_PATH) \
+  api/proto/*.proto
+ .PHONY: generate
 
 # TODO: remove
 reload:

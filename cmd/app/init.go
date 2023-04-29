@@ -8,7 +8,7 @@ import (
 	"syscall"
 	"yummy/config"
 	menu_repo "yummy/internal/app/menu/repo"
-	"yummy/internal/pkg/api"
+	"yummy/internal/pkg/rest"
 	"yummy/pkg/httpserver"
 	"yummy/test/postgres"
 )
@@ -17,7 +17,7 @@ func Run(cfg config.Config) {
 	// Init layers
 	db := postgres.NewPostgresTestDB(context.Background(), cfg.DB.GetDSN())
 	menuRepo := menu_repo.NewMenuRepo(db)
-	router := api.NewRouter(menuRepo)
+	router := rest.NewRouter(menuRepo)
 	server := httpserver.New(router, httpserver.Port("8080"))
 
 	// Waiting signal

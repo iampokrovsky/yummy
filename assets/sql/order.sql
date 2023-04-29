@@ -8,7 +8,7 @@ SELECT client_id, courier_id, restaurant_id
 FROM orders
 WHERE client_id = 3;
 
--- Get order by _restaurant id
+-- Get order by restaurant id
 SELECT client_id, courier_id, restaurant_id
 FROM orders
 WHERE restaurant_id = 3;

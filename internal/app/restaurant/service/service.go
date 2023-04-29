@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	"yummy/internal/app/_restaurant/model"
+	"yummy/internal/app/restaurant/model"
 )
 
 type Repo interface {
@@ -27,12 +27,12 @@ func NewService(repo Repo) *Service {
 	}
 }
 
-// Create creates a _restaurant
+// Create creates a restaurant
 func (s *Service) Create(ctx context.Context, item model.Restaurant) (model.ID, error) {
 	return s.repo.Create(ctx, item)
 }
 
-// GetByID returns a _restaurant by ID
+// GetByID returns a restaurant by ID
 func (s *Service) GetByID(ctx context.Context, id model.ID) (model.Restaurant, error) {
 	return s.repo.GetByID(ctx, id)
 }
@@ -52,17 +52,17 @@ func (s *Service) ListByCuisine(ctx context.Context, cuisine string) ([]model.Re
 	return s.repo.ListByCuisine(ctx, cuisine)
 }
 
-// Update updates a _restaurant
+// Update updates a restaurant
 func (s *Service) Update(ctx context.Context, item model.Restaurant) (bool, error) {
 	return s.repo.Update(ctx, item)
 }
 
-// Delete removes a _restaurant by ID
+// Delete removes a restaurant by ID
 func (s *Service) Delete(ctx context.Context, id model.ID) (bool, error) {
 	return s.repo.Delete(ctx, id)
 }
 
-// Restore restores a _restaurant item by ID
+// Restore restores a restaurant item by ID
 func (s *Service) Restore(ctx context.Context, id model.ID) (bool, error) {
 	return s.repo.Restore(ctx, id)
 }

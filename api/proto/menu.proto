@@ -1,0 +1,83 @@
+syntax = "proto3";
+
+package menu;
+option go_package = "./;api";
+
+import "google/protobuf/timestamp.proto";
+
+message MenuItem {
+  uint64 id = 1;
+  uint64 restaurant_id = 2;
+  string name = 3;
+  int64 price = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+  google.protobuf.Timestamp deleted_at = 7;
+}
+
+// MenuService is the menu service.
+service MenuService {
+  rpc Create(CreateRequest) returns (CreateResponse);
+  rpc GetByID(GetByIDRequest) returns (GetByIDResponse);
+  rpc ListByRestaurantID(ListByRestaurantIDRequest) returns (ListByRestaurantIDResponse);
+  rpc ListByName(ListByNameRequest) returns (ListByNameResponse);
+  rpc Update(UpdateRequest) returns (UpdateResponse);
+  rpc Delete(DeleteRequest) returns (DeleteResponse);
+  rpc Restore(RestoreRequest) returns (RestoreResponse);
+}
+
+message CreateRequest {
+  repeated MenuItem items = 1;
+}
+
+message CreateResponse {
+  repeated uint64 ids = 1;
+}
+
+message GetByIDRequest {
+  uint64 id = 1;
+}
+
+message GetByIDResponse {
+  MenuItem item = 1;
+}
+
+message ListByRestaurantIDRequest {
+  uint64 id = 1;
+}
+
+message ListByRestaurantIDResponse {
+  repeated MenuItem items = 1;
+}
+
+message ListByNameRequest {
+  string name = 1;
+}
+
+message ListByNameResponse {
+  repeated MenuItem items = 1;
+}
+
+message UpdateRequest {
+  repeated MenuItem items = 1;
+}
+
+message UpdateResponse {
+  bool ok = 1;
+}
+
+message DeleteRequest {
+  repeated uint64 ids = 1;
+}
+
+message DeleteResponse {
+  bool ok = 1;
+}
+
+message RestoreRequest {
+  repeated uint64 ids = 1;
+}
+
+message RestoreResponse {
+  bool ok = 1;
+}
